@@ -284,10 +284,16 @@
       <div id="employee-attendance-list" class="space-y-3 pb-20"></div>
      </div>
 
-     <!-- TAB: Roster -->
+     <!-- TAB: Roster (DIPERBAIKI DENGAN SWAP) -->
      <div id="employee-tab-roster" class="tab-content hidden">
         <h3 class="font-bold mb-4 text-gray-800 px-1">Jadwal Shift Saya</h3>
-        <div id="employee-roster-list" class="grid grid-cols-1 gap-3"></div>
+        <div id="employee-roster-list" class="grid grid-cols-1 gap-3 mb-8"></div>
+        
+        <!-- BAGIAN BURSA SWAP -->
+        <h3 class="font-bold mb-4 text-gray-800 px-1 border-t pt-4">🔄 Bursa Tukar Shift</h3>
+        <div id="employee-swap-list" class="space-y-3">
+            <div class="text-center text-gray-400 text-sm py-4">Memuat tawaran...</div>
+        </div>
      </div>
      
      <!-- TAB: Leave -->
@@ -337,6 +343,25 @@
    </div>
   </div>
 
+  <!-- SWAP REQUEST MODAL -->
+  <div id="swap-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 class="text-xl font-bold mb-4">🔄 Tawarkan Shift</h2>
+      <p class="text-sm text-gray-600 mb-4">Anda akan menawarkan shift ini ke bursa. Karyawan lain bisa mengambilnya.</p>
+      <div class="bg-gray-100 p-3 rounded mb-4 text-sm">
+          <p><strong>Tanggal:</strong> <span id="swap-date-disp"></span></p>
+          <p><strong>Shift:</strong> <span id="swap-shift-disp"></span></p>
+      </div>
+      <input type="hidden" id="swap-roster-date">
+      <input type="hidden" id="swap-shift-type">
+      <textarea id="swap-reason" class="w-full p-2 border rounded text-sm mb-4" placeholder="Alasan (Wajib diisi)..."></textarea>
+      <div class="flex gap-2">
+          <button onclick="submitSwapRequest()" id="btn-submit-swap" class="flex-1 bg-indigo-600 text-white py-2 rounded font-bold">Posting Tawaran</button>
+          <button onclick="document.getElementById('swap-modal').classList.add('hidden')" class="flex-1 bg-gray-300 py-2 rounded font-bold">Batal</button>
+      </div>
+    </div>
+  </div>
+
   <div id="correction-modal" class="modal-overlay hidden">
     <div class="modal-content">
       <h2 class="text-xl font-bold mb-4">✏️ Koreksi Absensi</h2>
@@ -372,6 +397,44 @@
     }
     function dismissInstall() { document.getElementById('install-prompt').classList.add('hidden'); }
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Fail', err)); }); }
+
+    // --- NOTIFICATION LOGIC (PUSH SIMULATION) ---
+    function initNotifications() {
+        if (!("Notification" in window)) return;
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") showToast("Notifikasi diaktifkan!");
+            });
+        }
+    }
+
+    function checkShiftReminders() {
+        if (Notification.permission !== "granted" || !currentUser) return;
+        
+        const today = getLocalISOString();
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMin = now.getMinutes();
+        
+        // Cari jadwal hari ini
+        const myRoster = allData.find(d => d.type === 'roster' && d.employee_id === currentUser.employee_id && d.roster_date === today);
+        
+        if (myRoster && myRoster.shift_type !== 'Off') {
+            const rule = SHIFT_RULES[myRoster.shift_type];
+            // Konversi jam start ke menit
+            const startMins = rule.start_h * 60 + rule.start_m;
+            const nowMins = currentHour * 60 + currentMin;
+            const diff = startMins - nowMins;
+            
+            // Ingatkan 30 menit sebelum (diff == 30)
+            if (diff === 30) { 
+                 new Notification("⏰ Pengingat Shift", { 
+                     body: `Halo ${currentUser.name}, Shift ${myRoster.shift_type} dimulai dalam 30 menit lagi!`,
+                     icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041891.png'
+                 });
+            }
+        }
+    }
 
     // --- APP CONFIG ---
     const API_URL = "https://script.google.com/macros/s/AKfycby49EpPVo7oHgFLLjS421nnYdKt7EjGa6elDQ4jKfnXa_9xQdtr2ysXbuwDB_j7G2cQ/exec";
@@ -427,6 +490,9 @@
                 document.getElementById('payroll-end').value = today;
             }
         }
+        
+        // Loop Reminder Check every minute
+        setInterval(checkShiftReminders, 60000);
     }
 
     async function handleLogin(e) {
@@ -437,6 +503,9 @@
             currentUser = res.user;
             document.getElementById('login-screen').classList.add('hidden');
             await initApp();
+            // Request Notification Permission on Login Success
+            initNotifications();
+            
             if(res.role === 'manager') {
                 document.getElementById('manager-dashboard').classList.remove('hidden');
                 updateManagerDashboard();
@@ -745,7 +814,7 @@
             if(t===tab) { btn.classList.add('text-green-600','border-b-2','border-green-600'); btn.classList.remove('text-gray-400'); }
             else { btn.classList.remove('text-green-600','border-b-2','border-green-600'); btn.classList.add('text-gray-400'); }
         });
-        if(tab==='roster') renderEmployeeRoster();
+        if(tab==='roster') { renderEmployeeRoster(); renderSwapMarket(); } // UPDATED
         if(tab==='leave') renderEmployeeLeaveList();
     }
 
@@ -878,7 +947,7 @@
         hideClockOutModal(); await initApp(); updateEmployeeDashboard(); showToast("Clock Out Sukses");
     }
 
-    // --- Roster Grid Renderer (Style Updated) ---
+    // --- OTHER ---
     function renderRosterGrid() { 
         const headerRow = document.getElementById('roster-header-row');
         const body = document.getElementById('roster-grid-body');
@@ -933,13 +1002,17 @@
 
     function changeRosterWeek(o) { currentRosterWeekOffset += o; renderRosterGrid(); }
     
-    // UPDATED: EMPLOYEE ROSTER DISPLAY
+    // UPDATED: EMPLOYEE ROSTER WITH SWAP BUTTON
     function renderEmployeeRoster() {
         const r = allData.filter(d => d.type === 'roster' && d.employee_id === currentUser.employee_id);
+        const today = getLocalISOString();
         
-        r.sort((a,b) => new Date(a.roster_date) - new Date(b.roster_date));
+        // Filter Future Shifts only for swapping
+        const futureShifts = r.filter(i => i.roster_date >= today && i.shift_type !== 'Off');
+        
+        futureShifts.sort((a,b) => new Date(a.roster_date) - new Date(b.roster_date));
 
-        const html = r.map(i => {
+        const html = futureShifts.map(i => {
             const dateObj = new Date(i.roster_date);
             const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
@@ -962,9 +1035,6 @@
                     timeRange = '16:00 - 24:00'; 
                     styleClass = 'style-malam'; textClass = 'text-malam'; badgeClass = 'badge-malam'; icon = '🌙';
                     break;
-                default: 
-                    timeRange = 'Libur'; 
-                    styleClass = 'style-off'; textClass = 'text-off'; badgeClass = 'badge-off'; icon = '🏖️';
             }
 
             return `
@@ -979,13 +1049,90 @@
                         </div>
                     </div>
                 </div>
-                <div class="${badgeClass} px-3 py-1 rounded-full text-xs font-bold">
-                    ${i.shift_type === 'Off' ? 'OFF' : 'ON'}
-                </div>
+                <button onclick="openSwapModal('${i.roster_date}', '${i.shift_type}')" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm hover:bg-indigo-200">
+                    🔄 Tawarkan
+                </button>
             </div>`;
         }).join('');
 
-        document.getElementById('employee-roster-list').innerHTML = html || '<div class="text-center p-8 text-gray-400">Belum ada jadwal.</div>';
+        document.getElementById('employee-roster-list').innerHTML = html || '<div class="text-center p-8 text-gray-400">Tidak ada jadwal aktif.</div>';
+    }
+
+    // --- SWAP FUNCTIONS ---
+    function openSwapModal(date, type) {
+        document.getElementById('swap-roster-date').value = date;
+        document.getElementById('swap-shift-type').value = type;
+        document.getElementById('swap-date-disp').innerText = date;
+        document.getElementById('swap-shift-disp').innerText = type;
+        document.getElementById('swap-modal').classList.remove('hidden');
+    }
+
+    async function submitSwapRequest() {
+        const btn = document.getElementById('btn-submit-swap');
+        btn.disabled = true; btn.innerText = 'Posting...';
+        
+        const payload = {
+            type: 'swap_request',
+            roster_date: document.getElementById('swap-roster-date').value,
+            shift_type: document.getElementById('swap-shift-type').value,
+            employee_id: currentUser.employee_id,
+            name: currentUser.name,
+            reason: document.getElementById('swap-reason').value
+        };
+
+        const res = await postData('create', { payload });
+        if(res.isOk) {
+            showToast("Tawaran berhasil diposting!");
+            document.getElementById('swap-modal').classList.add('hidden');
+            await initApp();
+            showEmployeeTab('roster'); // Refresh
+        } else {
+            showToast("Gagal posting tawaran", "error");
+        }
+        btn.disabled = false; btn.innerText = 'Posting Tawaran';
+    }
+
+    function renderSwapMarket() {
+        const swaps = allData.filter(d => d.type === 'swap' && d.status === 'Open' && d.req_id !== currentUser.employee_id);
+        const list = document.getElementById('employee-swap-list');
+        
+        if (swaps.length === 0) {
+            list.innerHTML = '<div class="text-center text-gray-400 py-4 text-xs italic">Tidak ada tawaran shift saat ini.</div>';
+            return;
+        }
+
+        list.innerHTML = swaps.map(s => `
+            <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 flex justify-between items-center shadow-sm">
+                <div>
+                    <div class="font-bold text-gray-800 text-sm">${s.req_name}</div>
+                    <div class="text-xs text-gray-600 font-bold">${s.roster_date} (${s.shift_type})</div>
+                    <div class="text-[10px] text-gray-500 italic">"${s.reason}"</div>
+                </div>
+                <button onclick="takeSwap('${s.swap_id}', '${s.req_name}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold shadow hover:bg-green-700">
+                    Ambil
+                </button>
+            </div>
+        `).join('');
+    }
+
+    async function takeSwap(swapId, ownerName) {
+        if(!confirm(`Ambil shift milik ${ownerName}? Jadwal Anda akan diperbarui.`)) return;
+        
+        const payload = {
+            type: 'swap_take',
+            swap_id: swapId,
+            taker_id: currentUser.employee_id,
+            taker_name: currentUser.name
+        };
+
+        const res = await postData('update', { payload });
+        if(res.isOk) {
+            showToast("Shift berhasil diambil!");
+            await initApp();
+            showEmployeeTab('roster');
+        } else {
+            showToast(res.message, "error");
+        }
     }
 
     function renderEmployeeLeaveList() {
