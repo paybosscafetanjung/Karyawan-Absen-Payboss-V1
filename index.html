@@ -3,7 +3,6 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#4f46e5">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -34,28 +33,25 @@
     .tab-button.active { background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); color: white; }
     .tab-button:not(.active) { background: white; color: #6b7280; }
     
-    /* Shift Colors & Badges (Card Style) */
     .shift-card { transition: all 0.3s; border-left: 6px solid; }
     .shift-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    
-    /* STYLE UNTUK ROSTER GRID (KONTRAS) */
     .roster-cell { cursor: pointer; transition: all 0.2s; border-radius: 8px; padding: 8px 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     .roster-cell:hover { transform: scale(1.1); z-index: 10; }
 
-    /* Pagi: Biru */
+    /* Shift Styles */
     .shift-pagi { background: #E0F7FA; color: #006064; border: 2px solid #00BCD4; }
-    /* Siang: Oranye */
     .shift-siang { background: #FFF3E0; color: #E65100; border: 2px solid #FF9800; }
-    /* Malam: Ungu */
     .shift-malam { background: #F3E5F5; color: #4A148C; border: 2px solid #9C27B0; }
-    /* Off: Merah Muda/Abu */
     .shift-off { background: #FFEBEE; color: #C62828; border: 2px solid #EF9A9A; opacity: 0.7; }
 
-    /* Roster Table Layout */
+    .style-pagi { border-color: #00B4D8; background: #E0F7FA; } .text-pagi { color: #0077B6; } .badge-pagi { background: #CAF0F8; color: #0077B6; border: 1px solid #90E0EF; }
+    .style-siang { border-color: #FF9F1C; background: #FFF3E0; } .text-siang { color: #E65100; } .badge-siang { background: #FFE0B2; color: #E65100; border: 1px solid #FFCC80; }
+    .style-malam { border-color: #5A189A; background: #F3E5F5; } .text-malam { color: #4A148C; } .badge-malam { background: #E1BEE7; color: #4A148C; border: 1px solid #CE93D8; }
+    .style-off { border-color: #6C757D; background: #F8F9FA; } .text-off { color: #495057; } .badge-off { background: #E9ECEF; color: #495057; border: 1px solid #CED4DA; }
+
     .roster-table th, .roster-table td { border: 1px solid #e5e7eb; padding: 6px; text-align: center; min-width: 70px; }
     .roster-table th:first-child, .roster-table td:first-child { position: sticky; left: 0; background: white; z-index: 10; border-right: 2px solid #e5e7eb; min-width: 120px; text-align: left; }
     
-    /* Camera */
     .camera-view { width: 100%; border-radius: 12px; background: #000; overflow: hidden; position: relative; min-height: 240px; }
     video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
     .captured-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; display: none; }
@@ -64,16 +60,20 @@
  </head>
  <body class="bg-gray-100 select-none">
   
+  <!-- OFFLINE STATUS BANNER -->
+  <div id="offline-banner" class="hidden fixed top-0 left-0 w-full bg-red-600 text-white text-center py-2 z-50 shadow-md font-bold text-sm">
+    📡 Mode Offline: Data akan dikirim otomatis saat online.
+  </div>
+
+  <!-- SYNC INDICATOR -->
+  <div id="sync-indicator" class="hidden fixed bottom-20 right-4 bg-blue-600 text-white p-3 rounded-full shadow-xl z-50 animate-pulse flex items-center justify-center">
+    <span class="text-xl">🔄</span>
+  </div>
+
   <!-- INSTALL PROMPT -->
   <div id="install-prompt" class="hidden fixed bottom-4 left-4 right-4 bg-white p-4 rounded-xl shadow-2xl border-l-4 border-indigo-600 z-50 flex justify-between items-center animate-bounce">
-    <div>
-        <h3 class="font-bold text-gray-800">Install Aplikasi?</h3>
-        <p class="text-xs text-gray-500">Akses lebih cepat tanpa browser.</p>
-    </div>
-    <div class="flex gap-2">
-        <button onclick="dismissInstall()" class="text-gray-400 font-bold px-2">Nanti</button>
-        <button onclick="installPWA()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg">Install</button>
-    </div>
+    <div><h3 class="font-bold text-gray-800">Install Aplikasi?</h3><p class="text-xs text-gray-500">Akses lebih cepat tanpa browser.</p></div>
+    <div class="flex gap-2"><button onclick="dismissInstall()" class="text-gray-400 font-bold px-2">Nanti</button><button onclick="installPWA()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg">Install</button></div>
   </div>
 
   <!-- LOGIN SCREEN -->
@@ -88,7 +88,7 @@
    </div>
   </div>
 
-  <!-- MANAGER DASHBOARD -->
+  <!-- DASHBOARDS (MANAGER & EMPLOYEE SAME AS BEFORE, JUST RE-INSERTED FOR COMPLETENESS) -->
   <div id="manager-dashboard" class="hidden page-container">
    <header class="bg-white shadow-lg border-b-4 border-indigo-600 p-6 sticky top-0 z-20">
     <div class="flex justify-between items-center max-w-7xl mx-auto">
@@ -102,337 +102,168 @@
       <button onclick="showManagerTab('attendance')" id="tab-attendance" class="tab-button text-sm">📊 Absen</button>
       <button onclick="showManagerTab('payroll')" id="tab-payroll" class="tab-button text-sm">💰 Gaji</button>
       <button onclick="showManagerTab('roster')" id="tab-roster" class="tab-button text-sm">📅 Jadwal</button>
-      <button onclick="showManagerTab('report')" id="tab-report" class="tab-button text-sm">📈 Laporan</button>
+      <button onclick="showManagerTab('report')" id="tab-report" class="tab-button text-sm">📈 Analitik</button>
       <button onclick="showManagerTab('leave')" id="tab-leave" class="tab-button text-sm">📄 Izin</button>
     </div>
    </div>
-   
    <div class="scrollable-content max-w-7xl mx-auto w-full">
-    <!-- TAB: Employees -->
     <div id="manager-tab-employees" class="tab-content">
       <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Daftar Karyawan</h2><button onclick="showEmployeeForm()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm">+ Baru</button></div>
       <div id="employee-form" class="hidden mb-6 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
        <form onsubmit="saveEmployee(event)" class="grid grid-cols-1 gap-3">
         <input type="text" id="emp-id" readonly class="w-full p-3 border rounded-xl bg-gray-100 text-sm">
         <input type="text" id="emp-name" required class="w-full p-3 border rounded-xl text-sm" placeholder="Nama Lengkap">
-        <select id="emp-position" required class="w-full p-3 border rounded-xl text-sm">
-            <option value="Barista">Barista</option><option value="Bartender">Bartender</option><option value="Kasir">Kasir</option>
-            <option value="Pelayan">Pelayan</option><option value="Pramusaji">Pramusaji</option><option value="Chef">Chef</option>
-            <option value="Supervisor">Supervisor</option><option value="Security">Security</option>
-        </select>
-        <div class="grid grid-cols-2 gap-2">
-            <input type="tel" id="emp-phone" required class="w-full p-3 border rounded-xl text-sm" placeholder="No. WA">
-            <input type="number" id="emp-rate" required class="w-full p-3 border rounded-xl text-sm border-green-500" placeholder="Gaji/Hari (Rp)">
-        </div>
-        <input type="email" id="emp-email" required class="w-full p-3 border rounded-xl text-sm" placeholder="Email">
-        <input type="text" id="emp-password" required placeholder="Password" class="w-full p-3 border rounded-xl text-sm">
+        <select id="emp-position" required class="w-full p-3 border rounded-xl text-sm"><option value="Barista">Barista</option><option value="Bartender">Bartender</option><option value="Kasir">Kasir</option><option value="Pelayan">Pelayan</option><option value="Pramusaji">Pramusaji</option><option value="Chef">Chef</option><option value="Supervisor">Supervisor</option><option value="Security">Security</option></select>
+        <div class="grid grid-cols-2 gap-2"><input type="tel" id="emp-phone" required class="w-full p-3 border rounded-xl text-sm" placeholder="No. WA"><input type="number" id="emp-rate" required class="w-full p-3 border rounded-xl text-sm border-green-500" placeholder="Gaji/Hari (Rp)"></div>
+        <input type="email" id="emp-email" required class="w-full p-3 border rounded-xl text-sm" placeholder="Email"><input type="text" id="emp-password" required placeholder="Password" class="w-full p-3 border rounded-xl text-sm">
         <div class="flex gap-2 mt-2"><button type="submit" id="btn-save-employee" class="flex-1 bg-green-600 text-white font-bold py-2 rounded-lg">Simpan</button><button type="button" onclick="hideEmployeeForm()" class="flex-1 bg-gray-400 text-white font-bold py-2 rounded-lg">Batal</button></div>
        </form>
       </div>
       <div id="employee-list" class="space-y-3"></div>
     </div>
-
-    <!-- TAB: Attendance (3 COLUMNS MONITOR) -->
     <div id="manager-tab-attendance" class="tab-content hidden">
       <div class="mb-6">
-        <div class="flex justify-between items-center mb-4 px-2">
-            <h2 class="font-bold text-xl text-gray-800 flex items-center gap-2">📡 Live Monitor</h2>
-            <div class="text-sm bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-bold" id="monitor-date-display">...</div>
-        </div>
-        
+        <div class="flex justify-between items-center mb-4 px-2"><h2 class="font-bold text-xl text-gray-800 flex items-center gap-2">📡 Live Monitor</h2><div class="text-sm bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-bold" id="monitor-date-display">...</div></div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Kolom Pagi -->
-            <div class="bg-cyan-50 rounded-xl p-4 border border-cyan-100 shadow-sm h-full">
-                <h3 class="font-bold text-cyan-800 mb-3 flex items-center gap-2 border-b border-cyan-200 pb-2">
-                    🌅 Pagi <span class="text-xs bg-cyan-200 px-2 py-0.5 rounded-full ml-auto" id="count-pagi">0</span>
-                </h3>
-                <div id="monitor-pagi" class="space-y-3 min-h-[100px]"></div>
-            </div>
-
-            <!-- Kolom Siang -->
-            <div class="bg-orange-50 rounded-xl p-4 border border-orange-100 shadow-sm h-full">
-                <h3 class="font-bold text-orange-800 mb-3 flex items-center gap-2 border-b border-orange-200 pb-2">
-                    ☀️ Siang <span class="text-xs bg-orange-200 px-2 py-0.5 rounded-full ml-auto" id="count-siang">0</span>
-                </h3>
-                <div id="monitor-siang" class="space-y-3 min-h-[100px]"></div>
-            </div>
-
-            <!-- Kolom Malam -->
-            <div class="bg-purple-50 rounded-xl p-4 border border-purple-100 shadow-sm h-full">
-                <h3 class="font-bold text-purple-800 mb-3 flex items-center gap-2 border-b border-purple-200 pb-2">
-                    🌙 Malam <span class="text-xs bg-purple-200 px-2 py-0.5 rounded-full ml-auto" id="count-malam">0</span>
-                </h3>
-                <div id="monitor-malam" class="space-y-3 min-h-[100px]"></div>
-            </div>
+            <div class="bg-cyan-50 rounded-xl p-4 border border-cyan-100 shadow-sm h-full"><h3 class="font-bold text-cyan-800 mb-3 flex items-center gap-2 border-b border-cyan-200 pb-2">🌅 Pagi <span class="text-xs bg-cyan-200 px-2 py-0.5 rounded-full ml-auto" id="count-pagi">0</span></h3><div id="monitor-pagi" class="space-y-3 min-h-[100px]"></div></div>
+            <div class="bg-orange-50 rounded-xl p-4 border border-orange-100 shadow-sm h-full"><h3 class="font-bold text-orange-800 mb-3 flex items-center gap-2 border-b border-orange-200 pb-2">☀️ Siang <span class="text-xs bg-orange-200 px-2 py-0.5 rounded-full ml-auto" id="count-siang">0</span></h3><div id="monitor-siang" class="space-y-3 min-h-[100px]"></div></div>
+            <div class="bg-purple-50 rounded-xl p-4 border border-purple-100 shadow-sm h-full"><h3 class="font-bold text-purple-800 mb-3 flex items-center gap-2 border-b border-purple-200 pb-2">🌙 Malam <span class="text-xs bg-purple-200 px-2 py-0.5 rounded-full ml-auto" id="count-malam">0</span></h3><div id="monitor-malam" class="space-y-3 min-h-[100px]"></div></div>
         </div>
       </div>
-
-      <div class="bg-white rounded-2xl p-4 card-shadow">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="font-bold text-gray-800">Log Harian</h2>
-          <input type="date" id="manager-att-date" onchange="renderManagerAttendance()" class="p-1 border rounded text-sm bg-gray-50">
-        </div>
-        <div id="manager-attendance-list" class="space-y-3"></div>
-      </div>
+      <div class="bg-white rounded-2xl p-4 card-shadow"><div class="flex justify-between items-center mb-4"><h2 class="font-bold text-gray-800">Log Harian</h2><input type="date" id="manager-att-date" onchange="renderManagerAttendance()" class="p-1 border rounded text-sm bg-gray-50"></div><div id="manager-attendance-list" class="space-y-3"></div></div>
     </div>
-
-    <!-- TAB: PAYROLL (HARIAN) -->
     <div id="manager-tab-payroll" class="tab-content hidden">
         <div class="bg-white rounded-2xl p-6 card-shadow border-t-4 border-green-500">
             <h3 class="font-bold mb-4 text-gray-800 flex items-center gap-2">💰 Estimasi Gaji (Harian)</h3>
-            <div class="grid grid-cols-2 gap-2 mb-4 bg-green-50 p-4 rounded-xl">
-                <div><label class="text-xs font-bold text-gray-600">Dari</label><input type="date" id="payroll-start" class="w-full p-2 border rounded-lg text-sm bg-white"></div>
-                <div><label class="text-xs font-bold text-gray-600">Sampai</label><input type="date" id="payroll-end" class="w-full p-2 border rounded-lg text-sm bg-white"></div>
-            </div>
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-green-50 p-4 rounded-xl"><div><label class="text-xs font-bold text-gray-600">Dari</label><input type="date" id="payroll-start" class="w-full p-2 border rounded-lg text-sm bg-white"></div><div><label class="text-xs font-bold text-gray-600">Sampai</label><input type="date" id="payroll-end" class="w-full p-2 border rounded-lg text-sm bg-white"></div></div>
             <button onclick="calculatePayroll()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold mb-6 shadow-lg hover:bg-green-700 transition">Hitung Estimasi</button>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-700">
-                            <th class="p-3 border-b">Nama</th>
-                            <th class="p-3 border-b text-center">Jml Hadir</th>
-                            <th class="p-3 border-b text-center">Gaji/Hari</th>
-                            <th class="p-3 border-b text-right">Estimasi Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="payroll-table-body" class="text-gray-600">
-                        <tr><td colspan="4" class="p-8 text-center text-gray-400">Pilih tanggal untuk hitung gaji.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-4 text-xs text-gray-400 italic text-right">*Total = Jumlah Hari Hadir x Gaji Harian.</div>
+            <div class="overflow-x-auto"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-gray-100 text-gray-700"><th class="p-3 border-b">Nama</th><th class="p-3 border-b text-center">Jml Hadir</th><th class="p-3 border-b text-center">Gaji/Hari</th><th class="p-3 border-b text-right">Estimasi Total</th></tr></thead><tbody id="payroll-table-body" class="text-gray-600"><tr><td colspan="4" class="p-8 text-center text-gray-400">Pilih tanggal.</td></tr></tbody></table></div>
         </div>
     </div>
-    
-    <!-- TAB: Roster (JADWAL KONTRAS) -->
     <div id="manager-tab-roster" class="tab-content hidden">
       <div class="bg-white rounded-2xl p-4 card-shadow">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="font-bold">Jadwal Shift</h2>
-            <div class="flex gap-1 items-center bg-gray-100 p-1 rounded-lg">
-                <button onclick="changeRosterWeek(-1)" class="px-2 py-1 bg-white rounded shadow text-xs font-bold">&lt;</button>
-                <span id="roster-period-label" class="px-2 text-xs font-bold">Minggu Ini</span>
-                <button onclick="changeRosterWeek(1)" class="px-2 py-1 bg-white rounded shadow text-xs font-bold">&gt;</button>
-            </div>
-        </div>
-        <div class="overflow-x-auto pb-2">
-            <table class="roster-table w-full text-xs">
-                <thead><tr class="bg-gray-100" id="roster-header-row"><th class="p-2">Staff</th></tr></thead>
-                <tbody id="roster-grid-body"></tbody>
-            </table>
-        </div>
-        <div class="mt-4 flex flex-wrap gap-4 text-xs">
-            <span class="flex items-center gap-1 font-bold text-cyan-800"><div class="w-3 h-3 bg-[#E0F7FA] border-2 border-[#00BCD4]"></div> Pagi (00-08)</span>
-            <span class="flex items-center gap-1 font-bold text-orange-800"><div class="w-3 h-3 bg-[#FFF3E0] border-2 border-[#FF9800]"></div> Siang (08-16)</span>
-            <span class="flex items-center gap-1 font-bold text-purple-800"><div class="w-3 h-3 bg-[#F3E5F5] border-2 border-[#9C27B0]"></div> Malam (16-24)</span>
-            <span class="flex items-center gap-1 font-bold text-gray-600"><div class="w-3 h-3 bg-[#FFEBEE] border-2 border-[#EF9A9A]"></div> OFF</span>
-        </div>
+        <div class="flex justify-between items-center mb-4"><h2 class="font-bold">Jadwal Shift</h2><div class="flex gap-1 items-center bg-gray-100 p-1 rounded-lg"><button onclick="changeRosterWeek(-1)" class="px-2 py-1 bg-white rounded shadow text-xs font-bold">&lt;</button><span id="roster-period-label" class="px-2 text-xs font-bold">Minggu Ini</span><button onclick="changeRosterWeek(1)" class="px-2 py-1 bg-white rounded shadow text-xs font-bold">&gt;</button></div></div>
+        <div class="overflow-x-auto pb-2"><table class="roster-table w-full text-xs"><thead><tr class="bg-gray-100" id="roster-header-row"><th class="p-2">Staff</th></tr></thead><tbody id="roster-grid-body"></tbody></table></div>
+        <div class="mt-4 flex flex-wrap gap-4 text-xs"><span class="flex items-center gap-1 font-bold text-cyan-800"><div class="w-3 h-3 bg-[#E0F7FA] border-2 border-[#00BCD4]"></div> Pagi</span><span class="flex items-center gap-1 font-bold text-orange-800"><div class="w-3 h-3 bg-[#FFF3E0] border-2 border-[#FF9800]"></div> Siang</span><span class="flex items-center gap-1 font-bold text-purple-800"><div class="w-3 h-3 bg-[#F3E5F5] border-2 border-[#9C27B0]"></div> Malam</span></div>
       </div>
     </div>
-
-    <!-- TAB: REPORT -->
     <div id="manager-tab-report" class="tab-content hidden">
         <div class="bg-white rounded-2xl p-6 card-shadow">
-            <h3 class="font-bold mb-4">Laporan Kinerja</h3>
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <input type="date" id="report-start" class="w-full p-2 border rounded-lg text-sm">
-                <input type="date" id="report-end" class="w-full p-2 border rounded-lg text-sm">
+            <h3 class="font-bold mb-6 text-xl">📈 Analitik & Laporan</h3>
+            <div class="flex flex-wrap gap-4 mb-6"><div class="flex-1 min-w-[150px]"><label class="block text-xs font-bold text-gray-500 mb-1">Dari</label><input type="date" id="report-start" class="w-full p-2 border rounded-lg text-sm"></div><div class="flex-1 min-w-[150px]"><label class="block text-xs font-bold text-gray-500 mb-1">Sampai</label><input type="date" id="report-end" class="w-full p-2 border rounded-lg text-sm"></div><button onclick="generateReport()" class="w-full md:w-auto bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition self-end h-[38px] flex items-center justify-center">Tampilkan</button></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-gradient-to-br from-green-500 to-emerald-700 rounded-xl p-4 text-white shadow-lg"><div class="flex justify-between items-start"><div><p class="text-xs font-bold opacity-80 uppercase">🏆 Paling Rajin</p><h4 id="stat-top-employee" class="text-lg font-bold mt-1">-</h4></div><div class="text-2xl opacity-50">🥇</div></div><p id="stat-top-employee-detail" class="text-xs mt-2 opacity-90 font-mono">0 Kehadiran</p></div>
+                <div class="bg-gradient-to-br from-red-500 to-rose-700 rounded-xl p-4 text-white shadow-lg"><div class="flex justify-between items-start"><div><p class="text-xs font-bold opacity-80 uppercase">🐢 Sering Terlambat</p><h4 id="stat-late-employee" class="text-lg font-bold mt-1">-</h4></div><div class="text-2xl opacity-50">⚠️</div></div><p id="stat-late-count" class="text-xs mt-2 opacity-90 font-mono">0 Kali</p></div>
+                <div class="bg-gradient-to-br from-blue-500 to-indigo-700 rounded-xl p-4 text-white shadow-lg"><div class="flex justify-between items-start"><div><p class="text-xs font-bold opacity-80 uppercase">⏱️ Total Jam Tim</p><h4 id="stat-total-hours" class="text-lg font-bold mt-1">0 Jam</h4></div><div class="text-2xl opacity-50">⏳</div></div><p class="text-xs mt-2 opacity-90 font-mono">Periode Terpilih</p></div>
             </div>
-            <button onclick="generateReport()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold mb-4 shadow-lg">Tampilkan Data</button>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead><tr class="bg-gray-100 text-gray-700"><th class="p-2 border-b">Nama</th><th class="p-2 border-b text-center">Hadir</th><th class="p-2 border-b text-center">Jam</th><th class="p-2 border-b text-center">Lembur</th></tr></thead>
-                    <tbody id="report-table-body" class="text-gray-600"><tr><td colspan="4" class="p-4 text-center text-xs">Pilih rentang tanggal</td></tr></tbody>
-                </table>
-            </div>
+            <div class="overflow-x-auto border rounded-xl"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-gray-50 text-gray-700"><th class="p-3 border-b">Nama</th><th class="p-3 border-b text-center">Hadir</th><th class="p-3 border-b text-center">Telat</th><th class="p-3 border-b text-center">Jam Kerja</th></tr></thead><tbody id="report-table-body" class="text-gray-600"><tr><td colspan="4" class="p-8 text-center text-gray-400">Silakan pilih rentang tanggal.</td></tr></tbody></table></div>
         </div>
     </div>
-    
-    <!-- TAB: Leave -->
     <div id="manager-tab-leave" class="tab-content hidden"><div class="bg-white rounded-2xl p-6 card-shadow"><h2 class="font-bold mb-4">Daftar Pengajuan Izin</h2><div id="manager-leave-list" class="space-y-3"></div></div></div>
    </div>
   </div>
 
-  <!-- EMPLOYEE DASHBOARD -->
   <div id="employee-dashboard" class="hidden page-container">
-   <header class="gradient-success text-white shadow-lg p-6 rounded-b-3xl">
-    <div class="flex justify-between items-center">
-     <div><h1 class="text-2xl font-bold">Halo, <span id="emp-dash-name">User</span></h1><p class="text-green-100 text-sm">Selamat Bekerja!</p></div>
-     <button onclick="logout()" class="px-4 py-1 bg-white bg-opacity-20 rounded-lg text-xs font-bold">Keluar</button>
-    </div>
-   </header>
-   
+   <header class="gradient-success text-white shadow-lg p-6 rounded-b-3xl"><div class="flex justify-between items-center"><div><h1 class="text-2xl font-bold">Halo, <span id="emp-dash-name">User</span></h1><p class="text-green-100 text-sm">Selamat Bekerja!</p></div><button onclick="logout()" class="px-4 py-1 bg-white bg-opacity-20 rounded-lg text-xs font-bold">Keluar</button></div></header>
    <div class="scrollable-content -mt-6">
     <div class="bg-white p-2 rounded-xl shadow-lg flex justify-around mb-6 mx-2">
       <button onclick="showEmployeeTab('attendance')" id="emp-tab-attendance" class="flex-1 py-2 text-sm font-bold text-center text-green-600 border-b-2 border-green-600">Absen</button>
       <button onclick="showEmployeeTab('roster')" id="emp-tab-roster" class="flex-1 py-2 text-sm font-bold text-center text-gray-400">Jadwal</button>
       <button onclick="showEmployeeTab('leave')" id="emp-tab-leave" class="flex-1 py-2 text-sm font-bold text-center text-gray-400">Izin</button>
     </div>
-
     <div id="employee-content">
-     <!-- TAB: Attendance -->
      <div id="employee-tab-attendance" class="tab-content">
-      <div id="active-session-alert" class="hidden mb-4 bg-orange-50 border-l-4 border-orange-500 p-3 rounded-r-xl shadow-sm"><p class="font-bold text-orange-800 text-sm">⚠️ Shift Belum Selesai</p><p class="text-xs text-orange-600">Anda belum Clock Out dari sesi sebelumnya.</p></div>
-
-      <div class="grid grid-cols-2 gap-4 mb-6">
-       <button id="clock-in-btn" onclick="showClockInModal()" class="bg-white p-4 rounded-2xl shadow-lg text-center active:scale-95 transition border-b-4 border-green-500"><div class="text-4xl mb-2">🟢</div><h3 class="font-bold text-gray-700">Masuk</h3></button>
-       <button id="clock-out-btn" onclick="showClockOutModal()" class="bg-white p-4 rounded-2xl shadow-lg text-center active:scale-95 transition border-b-4 border-red-500 opacity-50 pointer-events-none"><div class="text-4xl mb-2">🔴</div><h3 class="font-bold text-gray-700">Pulang</h3></button>
-      </div>
-      
-      <h3 class="font-bold text-gray-700 mb-2 px-2">Riwayat Terbaru</h3>
-      <div id="employee-attendance-list" class="space-y-3 pb-20"></div>
+      <div id="active-session-alert" class="hidden mb-4 bg-orange-50 border-l-4 border-orange-500 p-3 rounded-r-xl shadow-sm"><p class="font-bold text-orange-800 text-sm">⚠️ Shift Belum Selesai</p><p class="text-xs text-orange-600">Anda belum Clock Out.</p></div>
+      <div class="grid grid-cols-2 gap-4 mb-6"><button id="clock-in-btn" onclick="showClockInModal()" class="bg-white p-4 rounded-2xl shadow-lg text-center active:scale-95 transition border-b-4 border-green-500"><div class="text-4xl mb-2">🟢</div><h3 class="font-bold text-gray-700">Masuk</h3></button><button id="clock-out-btn" onclick="showClockOutModal()" class="bg-white p-4 rounded-2xl shadow-lg text-center active:scale-95 transition border-b-4 border-red-500 opacity-50 pointer-events-none"><div class="text-4xl mb-2">🔴</div><h3 class="font-bold text-gray-700">Pulang</h3></button></div>
+      <h3 class="font-bold text-gray-700 mb-2 px-2">Riwayat Terbaru</h3><div id="employee-attendance-list" class="space-y-3 pb-20"></div>
      </div>
-
-     <!-- TAB: Roster (DIPERBAIKI DENGAN SWAP) -->
-     <div id="employee-tab-roster" class="tab-content hidden">
-        <h3 class="font-bold mb-4 text-gray-800 px-1">Jadwal Shift Saya</h3>
-        <div id="employee-roster-list" class="grid grid-cols-1 gap-3 mb-8"></div>
-        
-        <!-- BAGIAN BURSA SWAP -->
-        <h3 class="font-bold mb-4 text-gray-800 px-1 border-t pt-4">🔄 Bursa Tukar Shift</h3>
-        <div id="employee-swap-list" class="space-y-3">
-            <div class="text-center text-gray-400 text-sm py-4">Memuat tawaran...</div>
-        </div>
-     </div>
-     
-     <!-- TAB: Leave -->
-     <div id="employee-tab-leave" class="tab-content hidden">
-        <div class="bg-white rounded-2xl p-6 shadow-md mb-6">
-            <h3 class="font-bold mb-3">Form Izin</h3>
-            <form onsubmit="submitLeaveRequest(event)" class="space-y-3">
-                <select id="leave-type" class="w-full p-3 border rounded-xl bg-gray-50 text-sm"><option>Sakit</option><option>Izin</option><option>Cuti</option></select>
-                <div class="grid grid-cols-2 gap-2"><input type="date" id="leave-start-date" class="w-full p-2 border rounded-xl text-sm"><input type="date" id="leave-end-date" class="w-full p-2 border rounded-xl text-sm"></div>
-                <textarea id="leave-reason" class="w-full p-3 border rounded-xl text-sm" placeholder="Alasan..."></textarea>
-                <button type="submit" id="btn-submit-leave" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl shadow">Kirim</button>
-            </form>
-        </div>
-        <div id="employee-leave-list" class="space-y-3"></div>
-     </div>
+     <div id="employee-tab-roster" class="tab-content hidden"><h3 class="font-bold mb-4 text-gray-800 px-1">Jadwal Shift Saya</h3><div id="employee-roster-list" class="grid grid-cols-1 gap-3 mb-8"></div><h3 class="font-bold mb-4 text-gray-800 px-1 border-t pt-4">🔄 Bursa Tukar Shift</h3><div id="employee-swap-list" class="space-y-3"><div class="text-center text-gray-400 text-sm py-4">Memuat tawaran...</div></div></div>
+     <div id="employee-tab-leave" class="tab-content hidden"><div class="bg-white rounded-2xl p-6 shadow-md mb-6"><h3 class="font-bold mb-3">Form Izin</h3><form onsubmit="submitLeaveRequest(event)" class="space-y-3"><select id="leave-type" class="w-full p-3 border rounded-xl bg-gray-50 text-sm"><option>Sakit</option><option>Izin</option><option>Cuti</option></select><div class="grid grid-cols-2 gap-2"><input type="date" id="leave-start-date" class="w-full p-2 border rounded-xl text-sm"><input type="date" id="leave-end-date" class="w-full p-2 border rounded-xl text-sm"></div><textarea id="leave-reason" class="w-full p-3 border rounded-xl text-sm" placeholder="Alasan..."></textarea><button type="submit" id="btn-submit-leave" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl shadow">Kirim</button></form></div><div id="employee-leave-list" class="space-y-3"></div></div>
     </div>
    </div>
   </div>
 
   <!-- MODALS -->
-  <div id="clock-in-modal" class="modal-overlay hidden">
-   <div class="modal-content">
-    <h2 class="text-2xl font-bold text-center mb-4">✅ Absen Masuk</h2>
-    <div class="space-y-3">
-     <div class="bg-gray-100 p-3 rounded-xl"><div class="camera-view mb-2 h-48"><video id="video-in" autoplay playsinline></video><canvas id="canvas-in" class="hidden"></canvas><img id="photo-in" class="captured-photo"></div><button onclick="takeSnapshot('in')" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">📸 Ambil Foto</button><input type="hidden" id="selfie-in-data"></div>
-     <div id="cash-in-input-group" class="hidden"><input type="number" id="cash-in-amount" placeholder="Uang di Kasir (Rp)" class="w-full p-3 border-2 border-green-500 rounded-xl font-bold"></div>
-     <div class="bg-yellow-50 p-3 rounded-xl max-h-32 overflow-y-auto"><h3 class="font-bold text-xs mb-1">Tugas Awal:</h3><div id="job-desk-start" class="space-y-1 text-sm"></div></div>
-     <div class="flex gap-2"><button onclick="getLocation('in')" class="flex-1 bg-gray-200 py-2 rounded-lg font-bold text-sm">📍 Cek Lokasi</button><div id="gps-status-in" class="hidden text-xs flex items-center">...</div></div><input type="hidden" id="location-in">
-     <button onclick="clockIn(event)" id="btn-submit-clock-in" disabled class="w-full bg-gray-300 text-white py-3 rounded-xl font-bold shadow-lg transition">SUBMIT MASUK</button>
-     <button onclick="hideClockInModal()" class="w-full text-gray-500 py-2 text-sm">Batal</button>
-    </div>
-   </div>
-  </div>
-
-  <div id="clock-out-modal" class="modal-overlay hidden">
-   <div class="modal-content">
-    <h2 class="text-2xl font-bold text-center mb-4">⛔ Absen Pulang</h2>
-    <div class="space-y-3">
-     <div class="bg-gray-100 p-3 rounded-xl"><div class="camera-view mb-2 h-48"><video id="video-out" autoplay playsinline></video><canvas id="canvas-out" class="hidden"></canvas><img id="photo-out" class="captured-photo"></div><button onclick="takeSnapshot('out')" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">📸 Ambil Foto</button><input type="hidden" id="selfie-out-data"></div>
-     <div id="cash-out-input-group" class="hidden"><input type="number" id="cash-out-amount" placeholder="Sisa Uang Fisik (Rp)" class="w-full p-3 border-2 border-blue-500 rounded-xl font-bold"></div>
-     <div class="bg-orange-50 p-3 rounded-xl border border-orange-200"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="check-overtime" onchange="toggleOvertimeInput(this)" class="w-5 h-5 accent-orange-600"><span class="font-bold text-sm text-orange-800">Ada Lembur?</span></label><div id="overtime-inputs" class="hidden mt-2"><input type="number" id="overtime-duration" placeholder="Jam" class="w-full p-2 border rounded text-sm mb-1"><input type="text" id="overtime-reason" placeholder="Alasan" class="w-full p-2 border rounded text-sm"></div></div>
-     <div class="bg-yellow-50 p-3 rounded-xl max-h-32 overflow-y-auto"><h3 class="font-bold text-xs mb-1">Tugas Akhir:</h3><div id="job-desk-end" class="space-y-1 text-sm"></div></div>
-     <div class="flex gap-2"><button onclick="getLocation('out')" class="flex-1 bg-gray-200 py-2 rounded-lg font-bold text-sm">📍 Cek Lokasi</button><div id="gps-status-out" class="hidden text-xs flex items-center">...</div></div><input type="hidden" id="location-out">
-     <button onclick="clockOut(event)" id="btn-submit-clock-out" disabled class="w-full bg-gray-300 text-white py-3 rounded-xl font-bold shadow-lg transition">SUBMIT PULANG</button>
-     <button onclick="hideClockOutModal()" class="w-full text-gray-500 py-2 text-sm">Batal</button>
-    </div>
-   </div>
-  </div>
-
-  <!-- SWAP REQUEST MODAL -->
-  <div id="swap-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <h2 class="text-xl font-bold mb-4">🔄 Tawarkan Shift</h2>
-      <p class="text-sm text-gray-600 mb-4">Anda akan menawarkan shift ini ke bursa. Karyawan lain bisa mengambilnya.</p>
-      <div class="bg-gray-100 p-3 rounded mb-4 text-sm">
-          <p><strong>Tanggal:</strong> <span id="swap-date-disp"></span></p>
-          <p><strong>Shift:</strong> <span id="swap-shift-disp"></span></p>
-      </div>
-      <input type="hidden" id="swap-roster-date">
-      <input type="hidden" id="swap-shift-type">
-      <textarea id="swap-reason" class="w-full p-2 border rounded text-sm mb-4" placeholder="Alasan (Wajib diisi)..."></textarea>
-      <div class="flex gap-2">
-          <button onclick="submitSwapRequest()" id="btn-submit-swap" class="flex-1 bg-indigo-600 text-white py-2 rounded font-bold">Posting Tawaran</button>
-          <button onclick="document.getElementById('swap-modal').classList.add('hidden')" class="flex-1 bg-gray-300 py-2 rounded font-bold">Batal</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="correction-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <h2 class="text-xl font-bold mb-4">✏️ Koreksi Absensi</h2>
-      <form onsubmit="submitCorrection(event)" class="space-y-3">
-        <input type="hidden" id="correct-emp-id">
-        <div class="grid grid-cols-2 gap-2 text-sm">
-           <div><label class="block font-bold">Tanggal</label><input type="text" id="correct-date" readonly class="w-full p-2 bg-gray-100 border rounded"></div>
-           <div><label class="block font-bold">Nama</label><input type="text" id="correct-name" readonly class="w-full p-2 bg-gray-100 border rounded"></div>
-        </div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-           <div><label class="block font-bold">Masuk</label><input type="time" id="correct-in-time" class="w-full p-2 border rounded"></div>
-           <div><label class="block font-bold">Pulang</label><input type="time" id="correct-out-time" class="w-full p-2 border rounded"></div>
-        </div>
-        <div class="text-sm"><label class="block font-bold">Status</label><select id="correct-status" class="w-full p-2 border rounded"><option value="Tepat Waktu">Tepat Waktu</option><option value="Terlambat">Terlambat</option><option value="Lupa Absen">Lupa Absen</option><option value="Alpha">Alpha</option><option value="Izin">Izin</option></select></div>
-        <div class="flex gap-2 pt-2"><button type="submit" id="btn-submit-correction" class="flex-1 bg-indigo-600 text-white font-bold py-2 rounded">Simpan</button><button type="button" onclick="document.getElementById('correction-modal').classList.add('hidden')" class="flex-1 bg-gray-300 font-bold py-2 rounded">Batal</button></div>
-      </form>
-    </div>
-  </div>
+  <div id="clock-in-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="text-2xl font-bold text-center mb-4">✅ Absen Masuk</h2><div class="space-y-3"><div class="bg-gray-100 p-3 rounded-xl"><div class="camera-view mb-2 h-48"><video id="video-in" autoplay playsinline></video><canvas id="canvas-in" class="hidden"></canvas><img id="photo-in" class="captured-photo"></div><button onclick="takeSnapshot('in')" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">📸 Ambil Foto</button><input type="hidden" id="selfie-in-data"></div><div id="cash-in-input-group" class="hidden"><input type="number" id="cash-in-amount" placeholder="Uang di Kasir (Rp)" class="w-full p-3 border-2 border-green-500 rounded-xl font-bold"></div><div class="bg-yellow-50 p-3 rounded-xl max-h-32 overflow-y-auto"><h3 class="font-bold text-xs mb-1">Tugas Awal:</h3><div id="job-desk-start" class="space-y-1 text-sm"></div></div><div class="flex gap-2"><button onclick="getLocation('in')" class="flex-1 bg-gray-200 py-2 rounded-lg font-bold text-sm">📍 Cek Lokasi</button><div id="gps-status-in" class="hidden text-xs flex items-center">...</div></div><input type="hidden" id="location-in"><button onclick="clockIn(event)" id="btn-submit-clock-in" disabled class="w-full bg-gray-300 text-white py-3 rounded-xl font-bold shadow-lg transition">SUBMIT MASUK</button><button onclick="hideClockInModal()" class="w-full text-gray-500 py-2 text-sm">Batal</button></div></div></div>
+  <div id="clock-out-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="text-2xl font-bold text-center mb-4">⛔ Absen Pulang</h2><div class="space-y-3"><div class="bg-gray-100 p-3 rounded-xl"><div class="camera-view mb-2 h-48"><video id="video-out" autoplay playsinline></video><canvas id="canvas-out" class="hidden"></canvas><img id="photo-out" class="captured-photo"></div><button onclick="takeSnapshot('out')" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">📸 Ambil Foto</button><input type="hidden" id="selfie-out-data"></div><div id="cash-out-input-group" class="hidden"><input type="number" id="cash-out-amount" placeholder="Sisa Uang Fisik (Rp)" class="w-full p-3 border-2 border-blue-500 rounded-xl font-bold"></div><div class="bg-orange-50 p-3 rounded-xl border border-orange-200"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="check-overtime" onchange="toggleOvertimeInput(this)" class="w-5 h-5 accent-orange-600"><span class="font-bold text-sm text-orange-800">Ada Lembur?</span></label><div id="overtime-inputs" class="hidden mt-2"><input type="number" id="overtime-duration" placeholder="Jam" class="w-full p-2 border rounded text-sm mb-1"><input type="text" id="overtime-reason" placeholder="Alasan" class="w-full p-2 border rounded text-sm"></div></div><div class="bg-yellow-50 p-3 rounded-xl max-h-32 overflow-y-auto"><h3 class="font-bold text-xs mb-1">Tugas Akhir:</h3><div id="job-desk-end" class="space-y-1 text-sm"></div></div><div class="flex gap-2"><button onclick="getLocation('out')" class="flex-1 bg-gray-200 py-2 rounded-lg font-bold text-sm">📍 Cek Lokasi</button><div id="gps-status-out" class="hidden text-xs flex items-center">...</div></div><input type="hidden" id="location-out"><button onclick="clockOut(event)" id="btn-submit-clock-out" disabled class="w-full bg-gray-300 text-white py-3 rounded-xl font-bold shadow-lg transition">SUBMIT PULANG</button><button onclick="hideClockOutModal()" class="w-full text-gray-500 py-2 text-sm">Batal</button></div></div></div>
+  <div id="swap-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="text-xl font-bold mb-4">🔄 Tawarkan Shift</h2><p class="text-sm text-gray-600 mb-4">Anda akan menawarkan shift ini ke bursa.</p><div class="bg-gray-100 p-3 rounded mb-4 text-sm"><p><strong>Tanggal:</strong> <span id="swap-date-disp"></span></p><p><strong>Shift:</strong> <span id="swap-shift-disp"></span></p></div><input type="hidden" id="swap-roster-date"><input type="hidden" id="swap-shift-type"><textarea id="swap-reason" class="w-full p-2 border rounded text-sm mb-4" placeholder="Alasan..."></textarea><div class="flex gap-2"><button onclick="submitSwapRequest()" id="btn-submit-swap" class="flex-1 bg-indigo-600 text-white py-2 rounded font-bold">Posting</button><button onclick="document.getElementById('swap-modal').classList.add('hidden')" class="flex-1 bg-gray-300 py-2 rounded font-bold">Batal</button></div></div></div>
+  <div id="correction-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="text-xl font-bold mb-4">✏️ Koreksi Absensi</h2><form onsubmit="submitCorrection(event)" class="space-y-3"><input type="hidden" id="correct-emp-id"><div class="grid grid-cols-2 gap-2 text-sm"><div><label class="block font-bold">Tanggal</label><input type="text" id="correct-date" readonly class="w-full p-2 bg-gray-100 border rounded"></div><div><label class="block font-bold">Nama</label><input type="text" id="correct-name" readonly class="w-full p-2 bg-gray-100 border rounded"></div></div><div class="grid grid-cols-2 gap-2 text-sm"><div><label class="block font-bold">Masuk</label><input type="time" id="correct-in-time" class="w-full p-2 border rounded"></div><div><label class="block font-bold">Pulang</label><input type="time" id="correct-out-time" class="w-full p-2 border rounded"></div></div><div class="text-sm"><label class="block font-bold">Status</label><select id="correct-status" class="w-full p-2 border rounded"><option value="Tepat Waktu">Tepat Waktu</option><option value="Terlambat">Terlambat</option><option value="Lupa Absen">Lupa Absen</option><option value="Alpha">Alpha</option><option value="Izin">Izin</option></select></div><div class="flex gap-2 pt-2"><button type="submit" id="btn-submit-correction" class="flex-1 bg-indigo-600 text-white font-bold py-2 rounded">Simpan</button><button type="button" onclick="document.getElementById('correction-modal').classList.add('hidden')" class="flex-1 bg-gray-300 font-bold py-2 rounded">Batal</button></div></form></div></div>
 
   <script>
-    // --- PWA LOGIC ---
+    // --- PWA, NOTIFICATION & OFFLINE LOGIC ---
     let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); deferredPrompt = e;
-        document.getElementById('install-prompt').classList.remove('hidden');
-    });
-    async function installPWA() {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') document.getElementById('install-prompt').classList.add('hidden');
-        deferredPrompt = null;
-    }
-    function dismissInstall() { document.getElementById('install-prompt').classList.add('hidden'); }
-    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Fail', err)); }); }
+    const OFFLINE_QUEUE_KEY = 'payboss_offline_queue';
 
-    // --- NOTIFICATION LOGIC (PUSH SIMULATION) ---
-    function initNotifications() {
-        if (!("Notification" in window)) return;
-        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") showToast("Notifikasi diaktifkan!");
-            });
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-prompt').classList.remove('hidden'); });
+    async function installPWA() { if (!deferredPrompt) return; deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') document.getElementById('install-prompt').classList.add('hidden'); deferredPrompt = null; }
+    function dismissInstall() { document.getElementById('install-prompt').classList.add('hidden'); }
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Fail', err))); }
+
+    // Offline & Sync Manager
+    window.addEventListener('online', syncOfflineData);
+    window.addEventListener('offline', updateOnlineStatus);
+    window.addEventListener('load', () => { updateOnlineStatus(); syncOfflineData(); });
+
+    function updateOnlineStatus() {
+        const banner = document.getElementById('offline-banner');
+        if (!navigator.onLine) {
+            banner.classList.remove('hidden');
+        } else {
+            banner.classList.add('hidden');
         }
     }
 
+    async function saveToQueue(payload) {
+        let queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+        queue.push(payload);
+        localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+        showToast("Disimpan Offline. Akan dikirim saat online.", "warning");
+    }
+
+    async function syncOfflineData() {
+        if (!navigator.onLine) return;
+        
+        let queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+        if (queue.length === 0) return;
+
+        const indicator = document.getElementById('sync-indicator');
+        indicator.classList.remove('hidden');
+
+        const newQueue = [];
+        for (const item of queue) {
+            try {
+                // Gunakan fetch langsung tanpa pembungkus postData untuk kontrol error lebih baik
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    redirect: 'follow', 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                    body: JSON.stringify(item) 
+                });
+                const json = await res.json();
+                if (!json.isOk) newQueue.push(item); // Gagal server, keep
+            } catch (e) {
+                newQueue.push(item); // Masih gagal koneksi, keep
+            }
+        }
+
+        localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(newQueue));
+        indicator.classList.add('hidden');
+        
+        if (queue.length > newQueue.length) {
+            showToast("Data offline berhasil disinkronkan!", "success");
+            await initApp(); // Refresh data
+        }
+    }
+
+    function initNotifications() { if (!("Notification" in window)) return; if (Notification.permission !== "granted" && Notification.permission !== "denied") Notification.requestPermission(); }
     function checkShiftReminders() {
         if (Notification.permission !== "granted" || !currentUser) return;
-        
-        const today = getLocalISOString();
-        const now = new Date();
-        const currentHour = now.getHours();
-        const currentMin = now.getMinutes();
-        
-        // Cari jadwal hari ini
+        const today = getLocalISOString(), now = new Date(), currentHour = now.getHours(), currentMin = now.getMinutes();
         const myRoster = allData.find(d => d.type === 'roster' && d.employee_id === currentUser.employee_id && d.roster_date === today);
-        
         if (myRoster && myRoster.shift_type !== 'Off') {
             const rule = SHIFT_RULES[myRoster.shift_type];
-            // Konversi jam start ke menit
-            const startMins = rule.start_h * 60 + rule.start_m;
-            const nowMins = currentHour * 60 + currentMin;
-            const diff = startMins - nowMins;
-            
-            // Ingatkan 30 menit sebelum (diff == 30)
-            if (diff === 30) { 
-                 new Notification("⏰ Pengingat Shift", { 
-                     body: `Halo ${currentUser.name}, Shift ${myRoster.shift_type} dimulai dalam 30 menit lagi!`,
-                     icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041891.png'
-                 });
-            }
+            const startMins = rule.start_h * 60 + rule.start_m, nowMins = currentHour * 60 + currentMin;
+            if (startMins - nowMins === 30) new Notification("⏰ Pengingat Shift", { body: `Halo ${currentUser.name}, Shift ${myRoster.shift_type} mulai 30 menit lagi!`, icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041891.png' });
         }
     }
 
@@ -441,43 +272,52 @@
     const TARGET_LAT = -2.1717597105563065;
     const TARGET_LON = 115.40300588753108;
     const MAX_RADIUS_METERS = 200;
-
-    // --- SHIFT RULES ---
     const SHIFT_RULES = { 'Pagi': {start_h:0, start_m:0, end_h:8, end_m:0}, 'Siang': {start_h:8, start_m:0, end_h:16, end_m:0}, 'Malam': {start_h:16, start_m:0, end_h:23, end_m:59} };
     const SHIFT_TYPES = ['Off', 'Pagi', 'Siang', 'Malam'];
     const SHIFT_STYLES = { 'Off': 'shift-off', 'Pagi': 'shift-pagi', 'Siang': 'shift-siang', 'Malam': 'shift-malam' };
     const SHIFT_TIMES = { 'Pagi': '00:00-07:59', 'Siang': '08:00-15:59', 'Malam': '16:00-23:59', 'Off': '-' };
     const POSITION_RANK = { 'Supervisor': 1, 'Barista': 2, 'Bartender': 2, 'Kasir': 3, 'Chef': 4, 'Pelayan': 5, 'Pramusaji': 5 };
-
-    let allData = [], currentUser = null, mediaStream = null;
-    let currentJobDeskInCompleted = [], currentJobDeskOutCompleted = [];
-    let currentRosterWeekOffset = 0;
-
+    let allData = [], currentUser = null, mediaStream = null, currentJobDeskInCompleted = [], currentJobDeskOutCompleted = [], currentRosterWeekOffset = 0;
     const JOB_DESKS = {
-      'Barista': { start: ['Cek mesin espresso', 'Restock susu/kopi', 'Bersihkan bar'], end: ['Backflush mesin', 'Cuci alat', 'Matikan mesin'] },
-      'Bartender': { start: ['Cek stok sirup/es', 'Siapkan garnish', 'Cek blender'], end: ['Cuci gelas/alat', 'Bersihkan area', 'Restock kulkas'] },
-      'Kasir': { start: ['Hitung modal awal', 'Cek EDC/Struk', 'Login POS'], end: ['Closing POS', 'Hitung uang', 'Rapikan meja'] },
-      'Pelayan': { start: ['Cek meja/kursi', 'Siapkan cutlery', 'Cek menu'], end: ['Clear-up area', 'Reset meja', 'Sapu/Pel area'] },
-      'Pramusaji': { start: ['Cek meja/kursi', 'Siapkan cutlery', 'Cek menu'], end: ['Clear-up area', 'Reset meja', 'Sapu/Pel area'] },
-      'Chef': { start: ['Mise en place', 'Cek stok bahan', 'Nyalakan alat'], end: ['Bersihkan dapur', 'Wrap bahan', 'Matikan gas'] },
+      'Barista': { start: ['Cek mesin espresso', 'Restock susu', 'Bersihkan bar'], end: ['Backflush mesin', 'Cuci alat', 'Matikan mesin'] },
+      'Bartender': { start: ['Cek stok sirup', 'Siapkan garnish', 'Cek blender'], end: ['Cuci gelas', 'Bersihkan area', 'Restock kulkas'] },
+      'Kasir': { start: ['Hitung modal', 'Cek EDC', 'Login POS'], end: ['Closing POS', 'Hitung uang', 'Rapikan meja'] },
+      'Pelayan': { start: ['Cek meja', 'Siapkan cutlery', 'Cek menu'], end: ['Clear-up', 'Reset meja', 'Sapu/Pel'] },
+      'Pramusaji': { start: ['Cek meja', 'Siapkan cutlery', 'Cek menu'], end: ['Clear-up', 'Reset meja', 'Sapu/Pel'] },
+      'Chef': { start: ['Mise en place', 'Cek stok', 'Nyalakan alat'], end: ['Bersihkan dapur', 'Wrap bahan', 'Matikan gas'] },
       'Supervisor': { start: ['Briefing', 'Cek target'], end: ['Laporan', 'Kunci pintu'] },
       'Manager': { start: [], end: [] }, 'Security': { start: [], end: [] }
     };
 
-    // --- CORE FUNCTIONS ---
+    // --- CORE & MODIFIED POSTDATA ---
     async function postData(action, payload = {}) {
-      try {
-        const res = await fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action, ...payload }) });
-        return await res.json();
-      } catch (e) { return { isOk: false, message: "Gagal koneksi." }; }
+        // Cek koneksi dulu sebelum kirim
+        if (!navigator.onLine) {
+            // Hanya simpan aksi penting (Attendance/Request) ke queue
+            if (['create', 'update'].includes(action) && ['attendance', 'swap_request', 'swap_take'].includes(payload.type)) {
+                await saveToQueue({ action, ...payload });
+                return { isOk: true, message: "Disimpan Offline" }; // Fake success agar UI tidak error
+            }
+            return { isOk: false, message: "Koneksi terputus. Fitur ini butuh internet." };
+        }
+
+        try {
+            const res = await fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action, ...payload }) });
+            return await res.json();
+        } catch (e) {
+            // Jika fetch gagal (network error saat mencoba kirim)
+            if (['create', 'update'].includes(action)) {
+                await saveToQueue({ action, ...payload });
+                return { isOk: true, message: "Disimpan Offline (Net Error)" };
+            }
+            return { isOk: false, message: "Gagal koneksi." }; 
+        }
     }
 
     function getLocalISOString() { return new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10); }
     function getLocalTimeString() { const d=new Date(); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
     function formatRupiah(n) { return new Intl.NumberFormat('id-ID', {style:'currency', currency:'IDR'}).format(n); }
-    function showToast(msg, type='success') {
-      const t = document.createElement('div'); t.className = `toast ${type}`; t.innerText = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 3000);
-    }
+    function showToast(msg, type='success') { const t = document.createElement('div'); t.className = `toast ${type}`; t.innerText = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 3000); }
 
     async function initApp() {
         const res = await postData('getAll');
@@ -485,41 +325,30 @@
             allData = res.data;
             const today = getLocalISOString();
             if(document.getElementById('manager-att-date') && !document.getElementById('manager-att-date').value) document.getElementById('manager-att-date').value = today;
-            if(document.getElementById('payroll-start')) {
-                document.getElementById('payroll-start').value = today.slice(0, 8) + '01';
-                document.getElementById('payroll-end').value = today;
-            }
+            if(document.getElementById('payroll-start')) { document.getElementById('payroll-start').value = today.slice(0, 8) + '01'; document.getElementById('payroll-end').value = today; }
+            if(document.getElementById('report-start')) { document.getElementById('report-start').value = today.slice(0, 8) + '01'; document.getElementById('report-end').value = today; }
         }
-        
-        // Loop Reminder Check every minute
         setInterval(checkShiftReminders, 60000);
     }
 
     async function handleLogin(e) {
         e.preventDefault();
+        if(!navigator.onLine) return showToast("Login butuh internet!", "error");
+        
         const btn = document.getElementById('btn-login'); btn.innerText = "..."; btn.disabled = true;
         const res = await postData('login', { username: document.getElementById('login-username').value, password: document.getElementById('login-password').value });
         if(res.isOk) {
             currentUser = res.user;
             document.getElementById('login-screen').classList.add('hidden');
-            await initApp();
-            // Request Notification Permission on Login Success
-            initNotifications();
-            
-            if(res.role === 'manager') {
-                document.getElementById('manager-dashboard').classList.remove('hidden');
-                updateManagerDashboard();
-            } else {
-                document.getElementById('employee-dashboard').classList.remove('hidden');
-                document.getElementById('emp-dash-name').innerText = currentUser.name;
-                updateEmployeeDashboard();
-            }
+            await initApp(); initNotifications();
+            if(res.role === 'manager') { document.getElementById('manager-dashboard').classList.remove('hidden'); updateManagerDashboard(); } 
+            else { document.getElementById('employee-dashboard').classList.remove('hidden'); document.getElementById('emp-dash-name').innerText = currentUser.name; updateEmployeeDashboard(); }
             showToast("Berhasil Masuk!");
         } else { showToast(res.message, "error"); btn.innerText = "🚀 LOGIN MASUK"; btn.disabled = false; }
     }
     function logout() { location.reload(); }
 
-    // --- MANAGER LOGIC ---
+    // --- MANAGER ---
     function showManagerTab(tab) {
         document.querySelectorAll('#manager-dashboard .tab-content').forEach(el=>el.classList.add('hidden'));
         document.querySelectorAll('#manager-dashboard .tab-button').forEach(el=>{el.classList.remove('active'); el.classList.add('text-gray-500');});
@@ -529,652 +358,139 @@
         if(tab==='attendance') { renderManagerAttendance(); renderShiftMonitor(); }
         if(tab==='roster') renderRosterGrid();
     }
+    function updateManagerDashboard() { renderEmployeeList(); renderManagerAttendance(); renderShiftMonitor(); renderManagerLeaveList(); }
     
-    function updateManagerDashboard() {
-        renderEmployeeList(); renderManagerAttendance(); renderShiftMonitor(); renderManagerLeaveList();
-    }
-
-    // CRUD Employee with Rate
     function showEmployeeForm() { document.getElementById('employee-form').classList.remove('hidden'); document.getElementById('emp-id').value = 'EMP'+Date.now().toString().slice(-4); }
     function hideEmployeeForm() { document.getElementById('employee-form').classList.add('hidden'); }
     async function saveEmployee(e) {
-        e.preventDefault();
-        document.getElementById('btn-save-employee').innerText = "...";
-        const payload = { 
-            type:'employee', employee_id: document.getElementById('emp-id').value, 
-            name: document.getElementById('emp-name').value, position: document.getElementById('emp-position').value, 
-            phone: document.getElementById('emp-phone').value, email: document.getElementById('emp-email').value, 
-            password: document.getElementById('emp-password').value, hourly_rate: document.getElementById('emp-rate').value 
-        };
+        e.preventDefault(); document.getElementById('btn-save-employee').innerText = "...";
+        const payload = { type:'employee', employee_id: document.getElementById('emp-id').value, name: document.getElementById('emp-name').value, position: document.getElementById('emp-position').value, phone: document.getElementById('emp-phone').value, email: document.getElementById('emp-email').value, password: document.getElementById('emp-password').value, hourly_rate: document.getElementById('emp-rate').value };
         await postData('create', {payload});
-        hideEmployeeForm(); showToast("Data tersimpan"); document.getElementById('btn-save-employee').innerText = "Simpan";
-        await initApp(); updateManagerDashboard();
+        hideEmployeeForm(); showToast("Data tersimpan"); document.getElementById('btn-save-employee').innerText = "Simpan"; await initApp(); updateManagerDashboard();
     }
     function renderEmployeeList() {
         const emps = allData.filter(d=>d.type==='employee');
-        document.getElementById('employee-list').innerHTML = emps.map(e => `
-            <div class="bg-white p-3 rounded-xl border flex justify-between items-center shadow-sm">
-                <div>
-                    <div class="font-bold text-gray-800">${e.name}</div>
-                    <div class="text-xs text-gray-500">${e.position} | Rate: ${formatRupiah(e.hourly_rate||0)}/hari</div>
-                </div>
-                <button onclick="deleteItem('${e.employee_id}', 'employee')" class="text-red-500 text-xs font-bold border border-red-200 px-2 py-1 rounded">Hapus</button>
-            </div>`).join('');
+        document.getElementById('employee-list').innerHTML = emps.map(e => `<div class="bg-white p-3 rounded-xl border flex justify-between items-center shadow-sm"><div><div class="font-bold text-gray-800">${e.name}</div><div class="text-xs text-gray-500">${e.position} | Rate: ${formatRupiah(e.hourly_rate||0)}/hari</div></div><button onclick="deleteItem('${e.employee_id}', 'employee')" class="text-red-500 text-xs font-bold border border-red-200 px-2 py-1 rounded">Hapus</button></div>`).join('');
     }
     async function deleteItem(id, type) { if(confirm("Hapus?")) { await postData('delete', {payload:{type, employee_id:id}}); await initApp(); updateManagerDashboard(); } }
 
-    // PAYROLL LOGIC (HARIAN)
-    function timeToHours(inTime, outTime) {
-        if(!inTime || !outTime) return 0;
-        const [h1, m1] = inTime.split(':').map(Number);
-        const [h2, m2] = outTime.split(':').map(Number);
-        let mins = (h2*60 + m2) - (h1*60 + m1);
-        if(mins < 0) mins += 24*60; // Cross midnight
-        return mins / 60;
-    }
-
+    function timeToHours(inTime, outTime) { if(!inTime || !outTime) return 0; const [h1, m1] = inTime.split(':').map(Number); const [h2, m2] = outTime.split(':').map(Number); let mins = (h2*60 + m2) - (h1*60 + m1); if(mins < 0) mins += 24*60; return mins / 60; }
     function calculatePayroll() {
-        const start = document.getElementById('payroll-start').value;
-        const end = document.getElementById('payroll-end').value;
+        const start = document.getElementById('payroll-start').value, end = document.getElementById('payroll-end').value;
         if(!start || !end) return alert("Pilih tanggal!");
-
-        const emps = allData.filter(d => d.type === 'employee');
         const atts = allData.filter(d => d.type === 'attendance' && d.attendance_date >= start && d.attendance_date <= end);
-        
-        let html = '';
-        emps.forEach(emp => {
-            const rate = parseInt(emp.hourly_rate) || 0;
-            const myAtts = atts.filter(a => a.employee_id === emp.employee_id);
-            
-            let totalDays = 0;
-            
-            myAtts.forEach(a => {
-                // Asumsi: Setiap record kehadiran valid dengan clock_in dihitung 1 hari
-                if(a.clock_in_time) {
-                    totalDays++;
-                }
-            });
-
-            // Kalkulasi: Total Hari x Gaji Harian
-            const estimatedSalary = totalDays * rate;
-
-            if(estimatedSalary > 0) {
-                html += `
-                <tr class="border-b hover:bg-green-50">
-                    <td class="p-3 font-bold text-gray-700">${emp.name}<br><span class="text-xs font-normal text-gray-500">${emp.position}</span></td>
-                    <td class="p-3 text-center">${totalDays}</td>
-                    <td class="p-3 text-center text-xs">${formatRupiah(rate)}</td>
-                    <td class="p-3 text-right font-bold text-green-700">${formatRupiah(estimatedSalary)}</td>
-                </tr>`;
-            }
-        });
-
-        document.getElementById('payroll-table-body').innerHTML = html || '<tr><td colspan="4" class="p-4 text-center">Tidak ada data kerja.</td></tr>';
+        document.getElementById('payroll-table-body').innerHTML = allData.filter(d => d.type === 'employee').map(emp => {
+            const rate = parseInt(emp.hourly_rate)||0, days = atts.filter(a => a.employee_id === emp.employee_id && a.clock_in_time).length, total = days * rate;
+            return total > 0 ? `<tr class="border-b hover:bg-green-50"><td class="p-3 font-bold text-gray-700">${emp.name}<br><span class="text-xs font-normal text-gray-500">${emp.position}</span></td><td class="p-3 text-center">${days}</td><td class="p-3 text-center text-xs">${formatRupiah(rate)}</td><td class="p-3 text-right font-bold text-green-700">${formatRupiah(total)}</td></tr>` : '';
+        }).join('') || '<tr><td colspan="4" class="p-4 text-center">Tidak ada data.</td></tr>';
     }
 
-    // MONITOR 3 COLUMNS
     function renderShiftMonitor() {
-        const today = getLocalISOString();
-        document.getElementById('monitor-date-display').innerText = today;
-        const nowTime = getLocalTimeString(); 
-
+        const today = getLocalISOString(); document.getElementById('monitor-date-display').innerText = today; const nowTime = getLocalTimeString();
         const roster = allData.filter(d => d.type === 'roster' && d.roster_date === today && d.shift_type !== 'Off');
         const att = allData.filter(d => d.type === 'attendance' && d.attendance_date === today);
-
-        const getDur = (inTime, outTime) => {
-            if (!inTime) return 0;
-            const end = outTime || nowTime;
-            return timeToHours(inTime, end);
-        };
-
-        const renderCard = (r) => {
-            const emp = allData.find(d => d.type === 'employee' && d.employee_id === r.employee_id);
-            const position = emp ? emp.position : 'Staff';
-
-            const a = att.find(x => x.employee_id === r.employee_id);
-            let status = '❌ Tidak Hadir';
-            let bg = 'bg-red-100 border-red-200';
-            let txt = 'text-red-700';
-            let detail = 'Belum Absen';
-
-            if (a) {
-                const dur = getDur(a.clock_in_time, a.clock_out_time);
-                
-                if (dur > 8) {
-                    status = '🔥 Lembur';
-                    bg = 'bg-purple-100 border-purple-200 animate-pulse';
-                    txt = 'text-purple-700';
-                    detail = `Durasi: ${dur.toFixed(1)} Jam`;
-                } else if (a.clock_out_time) {
-                    status = '🏠 Pulang';
-                    bg = 'bg-gray-100 border-gray-200';
-                    txt = 'text-gray-700';
-                    detail = `Out: ${a.clock_out_time}`;
-                } else {
-                    status = '✅ Hadir';
-                    bg = 'bg-green-100 border-green-200';
-                    txt = 'text-green-700';
-                    detail = `In: ${a.clock_in_time}`;
-                }
-            }
-
-            return `
-            <div class="bg-white p-2 mb-2 rounded-lg border shadow-sm flex justify-between items-center hover:shadow-md transition">
-                <div>
-                    <div class="font-bold text-sm text-gray-800">${r.name}</div>
-                    <div class="text-xs text-gray-500">${position}</div>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] font-bold px-2 py-1 rounded-full ${bg} ${txt} border inline-block mb-1">
-                        ${status}
-                    </span>
-                    <div class="text-[10px] text-gray-400 font-mono">${detail}</div>
-                </div>
-            </div>`;
-        };
-
         ['Pagi', 'Siang', 'Malam'].forEach(shift => {
             const list = roster.filter(r => r.shift_type === shift);
-            const container = document.getElementById(`monitor-${shift.toLowerCase()}`);
-            const countBadge = document.getElementById(`count-${shift.toLowerCase()}`);
-            
-            if(countBadge) countBadge.innerText = list.length;
-
-            if(container) {
-                container.innerHTML = list.length 
-                    ? list.map(renderCard).join('') 
-                    : `<div class="text-center text-xs text-gray-400 py-8 border-2 border-dashed rounded-lg bg-gray-50">Tidak ada jadwal ${shift}</div>`;
-            }
+            document.getElementById(`count-${shift.toLowerCase()}`).innerText = list.length;
+            document.getElementById(`monitor-${shift.toLowerCase()}`).innerHTML = list.length ? list.map(r => {
+                const a = att.find(x => x.employee_id === r.employee_id);
+                let st='❌ Tdk Hadir', bg='bg-red-100', txt='text-red-700', det='Belum Absen';
+                if(a) { const d=timeToHours(a.clock_in_time, a.clock_out_time||nowTime); if(d>8){st='🔥 Lembur';bg='bg-purple-100';txt='text-purple-700';det=`${d.toFixed(1)} Jam`;} else if(a.clock_out_time){st='🏠 Pulang';bg='bg-gray-100';txt='text-gray-700';det=`Out: ${a.clock_out_time}`;} else {st='✅ Hadir';bg='bg-green-100';txt='text-green-700';det=`In: ${a.clock_in_time}`;}}
+                return `<div class="bg-white p-2 mb-2 rounded-lg border shadow-sm flex justify-between items-center"><div><div class="font-bold text-sm text-gray-800">${r.name}</div><div class="text-xs text-gray-500">${allData.find(e=>e.employee_id===r.employee_id)?.position||'Staff'}</div></div><div class="text-right"><span class="text-[10px] font-bold px-2 py-1 rounded-full ${bg} ${txt} border inline-block mb-1">${st}</span><div class="text-[10px] text-gray-400 font-mono">${det}</div></div></div>`;
+            }).join('') : `<div class="text-center text-xs text-gray-400 py-8 border-2 border-dashed rounded-lg bg-gray-50">Kosong</div>`;
         });
     }
 
     function renderManagerAttendance() {
         const date = document.getElementById('manager-att-date').value;
         const data = allData.filter(d => d.type === 'attendance' && d.attendance_date === date);
-        document.getElementById('manager-attendance-list').innerHTML = data.length ? data.map(a => `
-            <div class="p-3 border rounded-xl bg-gray-50 text-sm">
-                <div class="flex justify-between font-bold text-gray-800"><span>${a.name}</span><span class="${a.attendance_status.includes('Terlambat')?'text-red-600':'text-green-600'}">${a.attendance_status}</span></div>
-                <div class="flex justify-between mt-1 text-xs text-gray-500"><span>In: ${a.clock_in_time}</span><span>Out: ${a.clock_out_time||'-'}</span></div>
-                ${a.cash_in_hand_start ? `<div class="mt-1 text-xs bg-white p-1 rounded border">💵 Kasir: ${formatRupiah(a.cash_in_hand_start)} -> ${formatRupiah(a.cash_in_hand_end||0)}</div>` : ''}
-                <div class="text-xs text-gray-400 mt-1 italic">${a.notes_out || a.notes_in}</div>
-                <button onclick="openCorrectionModal('${a.employee_id}','${a.attendance_date}')" class="mt-2 w-full bg-yellow-100 text-yellow-700 py-1 rounded text-xs font-bold">Koreksi</button>
-            </div>`).join('') : '<div class="text-center text-gray-400 text-sm py-4">Tidak ada data</div>';
+        document.getElementById('manager-attendance-list').innerHTML = data.length ? data.map(a => `<div class="p-3 border rounded-xl bg-gray-50 text-sm"><div class="flex justify-between font-bold text-gray-800"><span>${a.name}</span><span class="${a.attendance_status.includes('Terlambat')?'text-red-600':'text-green-600'}">${a.attendance_status}</span></div><div class="flex justify-between mt-1 text-xs text-gray-500"><span>In: ${a.clock_in_time}</span><span>Out: ${a.clock_out_time||'-'}</span></div>${a.cash_in_hand_start ? `<div class="mt-1 text-xs bg-white p-1 rounded border">💵 Kasir: ${formatRupiah(a.cash_in_hand_start)} -> ${formatRupiah(a.cash_in_hand_end||0)}</div>` : ''}<div class="text-xs text-gray-400 mt-1 italic">${a.notes_out || a.notes_in}</div><button onclick="openCorrectionModal('${a.employee_id}','${a.attendance_date}')" class="mt-2 w-full bg-yellow-100 text-yellow-700 py-1 rounded text-xs font-bold">Koreksi</button></div>`).join('') : '<div class="text-center text-gray-400 text-sm py-4">Tidak ada data</div>';
     }
 
-    // --- LEAVE MANAGEMENT LOGIC ---
     function renderManagerLeaveList() {
-      const list = document.getElementById('manager-leave-list');
       const leaves = allData.filter(d => d.type === 'leave');
-      
-      list.innerHTML = leaves.length ? leaves.map(l => `
-        <div class="bg-white p-4 border rounded-xl mb-2 shadow-sm">
-          <div class="flex justify-between items-center mb-1">
-            <span class="font-bold text-gray-800">${l.name}</span>
-            <span class="text-xs font-bold px-2 py-1 rounded ${l.status==='Pending'?'bg-yellow-100 text-yellow-800':(l.status==='Disetujui'?'bg-green-100 text-green-800':'bg-red-100 text-red-800')}">${l.status}</span>
-          </div>
-          <div class="text-sm font-bold text-indigo-600">${l.leave_type}</div>
-          <div class="text-xs text-gray-500">${l.start_date} s/d ${l.end_date}</div>
-          <p class="text-xs text-gray-600 mt-2 bg-gray-50 p-2 rounded italic">"${l.reason}"</p>
-          
-          ${l.status === 'Pending' ? `
-            <div class="flex gap-2 mt-3 border-t pt-2">
-              <button onclick="approveLeave('${l.employee_id}', '${l.start_date}', 'Disetujui')" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs font-bold shadow">Terima</button>
-              <button onclick="approveLeave('${l.employee_id}', '${l.start_date}', 'Ditolak')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-xs font-bold shadow">Tolak</button>
-            </div>
-          ` : ''}
-        </div>
-      `).join('') : '<div class="text-center text-gray-400 py-8">Belum ada pengajuan izin.</div>';
+      document.getElementById('manager-leave-list').innerHTML = leaves.length ? leaves.map(l => `<div class="bg-white p-4 border rounded-xl mb-2 shadow-sm"><div class="flex justify-between items-center mb-1"><span class="font-bold text-gray-800">${l.name}</span><span class="text-xs font-bold px-2 py-1 rounded ${l.status==='Pending'?'bg-yellow-100 text-yellow-800':(l.status==='Disetujui'?'bg-green-100 text-green-800':'bg-red-100 text-red-800')}">${l.status}</span></div><div class="text-sm font-bold text-indigo-600">${l.leave_type}</div><div class="text-xs text-gray-500">${l.start_date} s/d ${l.end_date}</div><p class="text-xs text-gray-600 mt-2 bg-gray-50 p-2 rounded italic">"${l.reason}"</p>${l.status === 'Pending' ? `<div class="flex gap-2 mt-3 border-t pt-2"><button onclick="approveLeave('${l.employee_id}', '${l.start_date}', 'Disetujui')" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs font-bold shadow">Terima</button><button onclick="approveLeave('${l.employee_id}', '${l.start_date}', 'Ditolak')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-xs font-bold shadow">Tolak</button></div>` : ''}</div>`).join('') : '<div class="text-center text-gray-400 py-8">Belum ada pengajuan izin.</div>';
     }
+    async function approveLeave(id, date, status) { const payload = { type: 'leave', employee_id: id, start_date: date, status: status, approved_by: 'Manager', approved_at: new Date().toISOString() }; const res = await postData('update', { payload }); if(res.isOk) { showToast(`Izin ${status}`); await initApp(); updateManagerDashboard(); } else { showToast("Gagal", "error"); } }
 
-    async function approveLeave(id, date, status) {
-      const payload = { 
-          type: 'leave', 
-          employee_id: id, 
-          start_date: date, 
-          status: status, 
-          approved_by: 'Manager', 
-          approved_at: new Date().toISOString() 
-      };
-      
-      const res = await postData('update', { payload });
-      if(res.isOk) {
-          showToast(`Izin ${status}`);
-          await initApp(); 
-          updateManagerDashboard();
-      } else {
-          showToast("Gagal update status", "error");
-      }
-    }
-
-    // --- REPORTING LOGIC ---
     function generateReport() {
-        const start = document.getElementById('report-start').value;
-        const end = document.getElementById('report-end').value;
-        const body = document.getElementById('report-table-body');
-
-        if(!start || !end) return alert("Pilih tanggal awal dan akhir!");
-
-        const atts = allData.filter(d => 
-            d.type === 'attendance' && 
-            d.attendance_date >= start && 
-            d.attendance_date <= end
-        );
-
+        const start = document.getElementById('report-start').value, end = document.getElementById('report-end').value;
+        if(!start || !end) return alert("Pilih tanggal!");
+        const atts = allData.filter(d => d.type === 'attendance' && d.attendance_date >= start && d.attendance_date <= end);
         const report = {};
-        
         atts.forEach(a => {
-            if(!report[a.employee_id]) {
-                report[a.employee_id] = { 
-                    name: a.name, 
-                    position: a.position, 
-                    count: 0, 
-                    workMinutes: 0, 
-                    overtimeHours: 0 
-                };
-            }
+            if(!report[a.employee_id]) report[a.employee_id] = { name: a.name, position: a.position, count: 0, workMinutes: 0, lateCount: 0 };
             report[a.employee_id].count++;
-            if(a.clock_in_time && a.clock_out_time) {
-                const inMins = timeToMinutes(a.clock_in_time); 
-                let outMins = timeToMinutes(a.clock_out_time);
-                if(outMins < inMins) outMins += (24 * 60);
-                report[a.employee_id].workMinutes += (outMins - inMins);
-            }
+            if(a.attendance_status && a.attendance_status.includes("Terlambat")) report[a.employee_id].lateCount++;
+            if(a.clock_in_time && a.clock_out_time) report[a.employee_id].workMinutes += timeToHours(a.clock_in_time, a.clock_out_time) * 60;
         });
-
-        if(Object.keys(report).length === 0) {
-            body.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-400">Tidak ada data pada periode ini.</td></tr>';
-            return;
-        }
-
-        body.innerHTML = Object.values(report).map(r => {
-            const totalHours = (r.workMinutes / 60).toFixed(1);
-            return `
-            <tr class="border-b hover:bg-gray-50">
-                <td class="p-2 border-b font-bold text-gray-800">${r.name}<br><span class="text-xs font-normal text-gray-500">${r.position}</span></td>
-                <td class="p-2 border-b text-center font-bold bg-blue-50 text-blue-800 rounded-lg">${r.count}</td>
-                <td class="p-2 border-b text-center font-bold text-gray-700">${totalHours}</td>
-                <td class="p-2 border-b text-center font-bold text-orange-600">-</td> 
-            </tr>
-            `;
-        }).join('');
-    }
-    
-    function timeToMinutes(timeStr) {
-        if(!timeStr) return 0;
-        const [h, m] = timeStr.split(':').map(Number);
-        return h * 60 + m;
+        const arr = Object.values(report);
+        const top = arr.sort((a,b)=>b.count-a.count)[0], late = [...arr].sort((a,b)=>b.lateCount-a.lateCount)[0], mins = arr.reduce((s,i)=>s+i.workMinutes,0);
+        document.getElementById('stat-top-employee').innerText = top ? top.name : '-'; document.getElementById('stat-top-employee-detail').innerText = top ? `${top.count} Kehadiran` : '0';
+        document.getElementById('stat-late-employee').innerText = late && late.lateCount>0 ? late.name : '-'; document.getElementById('stat-late-count').innerText = late ? `${late.lateCount} Kali` : '0';
+        document.getElementById('stat-total-hours').innerText = (mins/60).toFixed(1) + " Jam";
+        document.getElementById('report-table-body').innerHTML = arr.length ? arr.map(r => `<tr class="border-b hover:bg-gray-50"><td class="p-3 border-b font-bold text-gray-800">${r.name}<br><span class="text-xs font-normal text-gray-500">${r.position}</span></td><td class="p-3 border-b text-center font-bold bg-blue-50 text-blue-800 rounded-lg">${r.count}</td><td class="p-3 border-b text-center font-bold text-red-600">${r.lateCount||'-'}</td><td class="p-3 border-b text-center font-bold text-gray-700">${(r.workMinutes/60).toFixed(1)}</td></tr>`).join('') : '<tr><td colspan="4" class="p-8 text-center text-gray-400">Tidak ada data.</td></tr>';
     }
 
-    // --- EMPLOYEE LOGIC ---
+    // --- EMPLOYEE ---
     function showEmployeeTab(tab) {
         document.getElementById('employee-content').querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));
         document.getElementById('employee-tab-'+tab).classList.remove('hidden');
-        ['attendance','roster','leave'].forEach(t => {
-            const btn = document.getElementById('emp-tab-'+t);
-            if(t===tab) { btn.classList.add('text-green-600','border-b-2','border-green-600'); btn.classList.remove('text-gray-400'); }
-            else { btn.classList.remove('text-green-600','border-b-2','border-green-600'); btn.classList.add('text-gray-400'); }
-        });
-        if(tab==='roster') { renderEmployeeRoster(); renderSwapMarket(); } // UPDATED
+        ['attendance','roster','leave'].forEach(t => { const btn = document.getElementById('emp-tab-'+t); if(t===tab) { btn.classList.add('text-green-600','border-b-2','border-green-600'); btn.classList.remove('text-gray-400'); } else { btn.classList.remove('text-green-600','border-b-2','border-green-600'); btn.classList.add('text-gray-400'); } });
+        if(tab==='roster') { renderEmployeeRoster(); renderSwapMarket(); }
         if(tab==='leave') renderEmployeeLeaveList();
     }
-
     function updateEmployeeDashboard() {
         const myAtt = allData.filter(d => d.type === 'attendance' && d.employee_id === currentUser.employee_id);
-        const openSession = myAtt.find(d => !d.clock_out_time);
-        
-        const inBtn = document.getElementById('clock-in-btn');
-        const outBtn = document.getElementById('clock-out-btn');
-        const alertBox = document.getElementById('active-session-alert');
-        
-        if (openSession) {
-            inBtn.classList.add('opacity-50','pointer-events-none');
-            outBtn.classList.remove('opacity-50','pointer-events-none');
-            alertBox.classList.remove('hidden');
-        } else {
-            const today = getLocalISOString();
-            const todayDone = myAtt.find(d => d.attendance_date === today && d.clock_out_time);
-            if(todayDone) {
-                 inBtn.classList.add('opacity-50','pointer-events-none'); 
-                 outBtn.classList.add('opacity-50','pointer-events-none');
-            } else {
-                 inBtn.classList.remove('opacity-50','pointer-events-none');
-                 outBtn.classList.add('opacity-50','pointer-events-none');
-            }
-            alertBox.classList.add('hidden');
+        const open = myAtt.find(d => !d.clock_out_time);
+        if (open) { document.getElementById('clock-in-btn').classList.add('opacity-50','pointer-events-none'); document.getElementById('clock-out-btn').classList.remove('opacity-50','pointer-events-none'); document.getElementById('active-session-alert').classList.remove('hidden'); }
+        else { 
+            const done = myAtt.find(d => d.attendance_date === getLocalISOString() && d.clock_out_time);
+            document.getElementById('clock-in-btn').classList.toggle('opacity-50', !!done); document.getElementById('clock-in-btn').classList.toggle('pointer-events-none', !!done);
+            document.getElementById('clock-out-btn').classList.add('opacity-50','pointer-events-none');
+            document.getElementById('active-session-alert').classList.add('hidden');
         }
-
-        document.getElementById('employee-attendance-list').innerHTML = myAtt.slice(0,5).map(a => `
-            <div class="bg-white p-3 rounded-xl border-l-4 ${a.attendance_status.includes('Terlambat')?'border-red-500':'border-green-500'} shadow-sm">
-                <div class="flex justify-between font-bold text-gray-700 text-sm"><span>${a.attendance_date}</span><span class="text-xs bg-gray-100 px-2 py-1 rounded">${a.attendance_status}</span></div>
-                <div class="text-xs text-gray-500 mt-1">In: ${a.clock_in_time} | Out: ${a.clock_out_time||'--:--'}</div>
-            </div>`).join('');
+        document.getElementById('employee-attendance-list').innerHTML = myAtt.slice(0,5).map(a => `<div class="bg-white p-3 rounded-xl border-l-4 ${a.attendance_status.includes('Terlambat')?'border-red-500':'border-green-500'} shadow-sm"><div class="flex justify-between font-bold text-gray-700 text-sm"><span>${a.attendance_date}</span><span class="text-xs bg-gray-100 px-2 py-1 rounded">${a.attendance_status}</span></div><div class="text-xs text-gray-500 mt-1">In: ${a.clock_in_time} | Out: ${a.clock_out_time||'--:--'}</div></div>`).join('');
     }
 
-    // --- CLOCK IN/OUT ---
-    function detectShift(hour) { if(hour<8) return 'Pagi'; if(hour<16) return 'Siang'; return 'Malam'; }
-    function calculateLate(shift, time) {
-        const [h,m] = time.split(':').map(Number);
-        const mins = h*60+m;
-        const rule = SHIFT_RULES[shift];
-        const target = rule.start_h*60 + rule.start_m + 15; // 15 mins tolerance
-        return mins > target ? `Terlambat ${mins-target}m` : 'Tepat Waktu';
-    }
-
-    function showClockInModal() {
-        document.getElementById('clock-in-modal').classList.remove('hidden'); initCamera('in');
-        document.getElementById('cash-in-input-group').classList.toggle('hidden', currentUser.position !== 'Kasir');
-        const tasks = JOB_DESKS[currentUser.position]?.start || [];
-        document.getElementById('job-desk-start').innerHTML = tasks.map((t,i) => `<label class="flex gap-2 items-center"><input type="checkbox" onchange="updateJobIn(${i},this.checked)" class="accent-green-600"> ${t}</label>`).join('');
-    }
-    
-    function showClockOutModal() {
-        document.getElementById('clock-out-modal').classList.remove('hidden'); initCamera('out');
-        document.getElementById('cash-out-input-group').classList.toggle('hidden', currentUser.position !== 'Kasir');
-        const tasks = JOB_DESKS[currentUser.position]?.end || [];
-        document.getElementById('job-desk-end').innerHTML = tasks.map((t,i) => `<label class="flex gap-2 items-center"><input type="checkbox" onchange="updateJobOut(${i},this.checked)" class="accent-green-600"> ${t}</label>`).join('');
-    }
-
-    function hideClockInModal() { document.getElementById('clock-in-modal').classList.add('hidden'); stopCamera(); }
-    function hideClockOutModal() { document.getElementById('clock-out-modal').classList.add('hidden'); stopCamera(); }
-    function updateJobIn(i,c) { c ? currentJobDeskInCompleted.push(i) : currentJobDeskInCompleted.splice(currentJobDeskInCompleted.indexOf(i),1); }
-    function updateJobOut(i,c) { c ? currentJobDeskOutCompleted.push(i) : currentJobDeskOutCompleted.splice(currentJobDeskOutCompleted.indexOf(i),1); }
+    // --- UTILS ---
+    function detectShift(h) { if(h<8) return 'Pagi'; if(h<16) return 'Siang'; return 'Malam'; }
+    function calculateLate(shift, time) { const [h,m] = time.split(':').map(Number); const mins = h*60+m; const rule = SHIFT_RULES[shift]; const target = rule.start_h*60 + rule.start_m + 15; return mins > target ? `Terlambat ${mins-target}m` : 'Tepat Waktu'; }
+    function showClockInModal() { document.getElementById('clock-in-modal').classList.remove('hidden'); initCamera('in'); document.getElementById('cash-in-input-group').classList.toggle('hidden', currentUser.position !== 'Kasir'); document.getElementById('job-desk-start').innerHTML = (JOB_DESKS[currentUser.position]?.start||[]).map((t,i) => `<label class="flex gap-2 items-center"><input type="checkbox" onchange="updateJobIn(${i},this.checked)" class="accent-green-600"> ${t}</label>`).join(''); }
+    function showClockOutModal() { document.getElementById('clock-out-modal').classList.remove('hidden'); initCamera('out'); document.getElementById('cash-out-input-group').classList.toggle('hidden', currentUser.position !== 'Kasir'); document.getElementById('job-desk-end').innerHTML = (JOB_DESKS[currentUser.position]?.end||[]).map((t,i) => `<label class="flex gap-2 items-center"><input type="checkbox" onchange="updateJobOut(${i},this.checked)" class="accent-green-600"> ${t}</label>`).join(''); }
+    function hideClockInModal() { document.getElementById('clock-in-modal').classList.add('hidden'); stopCamera(); } function hideClockOutModal() { document.getElementById('clock-out-modal').classList.add('hidden'); stopCamera(); }
+    function updateJobIn(i,c) { c ? currentJobDeskInCompleted.push(i) : currentJobDeskInCompleted.splice(currentJobDeskInCompleted.indexOf(i),1); } function updateJobOut(i,c) { c ? currentJobDeskOutCompleted.push(i) : currentJobDeskOutCompleted.splice(currentJobDeskOutCompleted.indexOf(i),1); }
     function toggleOvertimeInput(cb) { document.getElementById('overtime-inputs').classList.toggle('hidden', !cb.checked); }
-
-    // Camera & GPS
-    async function initCamera(type) {
-        try { if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop()); mediaStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}}); document.getElementById('video-'+type).srcObject=mediaStream; } catch(e){showToast("Kamera error","error");}
-    }
-    function takeSnapshot(type) {
-        const v=document.getElementById('video-'+type), c=document.getElementById('canvas-'+type);
-        c.width=v.videoWidth; c.height=v.videoHeight; c.getContext('2d').drawImage(v,0,0);
-        document.getElementById('selfie-'+type+'-data').value = c.toDataURL('image/jpeg');
-        document.getElementById('photo-'+type).src = c.toDataURL('image/jpeg');
-        document.getElementById('photo-'+type).classList.remove('hidden'); v.classList.add('hidden');
-    }
+    async function initCamera(t) { try { if(mediaStream) mediaStream.getTracks().forEach(track=>track.stop()); mediaStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}}); document.getElementById('video-'+t).srcObject=mediaStream; } catch(e){showToast("Kamera error","error");} }
+    function takeSnapshot(t) { const v=document.getElementById('video-'+t), c=document.getElementById('canvas-'+t); c.width=v.videoWidth; c.height=v.videoHeight; c.getContext('2d').drawImage(v,0,0); document.getElementById('selfie-'+t+'-data').value = c.toDataURL('image/jpeg'); document.getElementById('photo-'+t).src = c.toDataURL('image/jpeg'); document.getElementById('photo-'+t).classList.remove('hidden'); v.classList.add('hidden'); }
     function stopCamera() { if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop()); }
-
-    function getLocation(type) {
-        const st = document.getElementById('gps-status-'+type), btn = document.getElementById('btn-submit-clock-'+type);
-        st.classList.remove('hidden'); st.innerText = "Mencari...";
-        navigator.geolocation.getCurrentPosition(pos => {
-            const dist = getDist(pos.coords.latitude, pos.coords.longitude, TARGET_LAT, TARGET_LON);
-            document.getElementById('location-'+type).value = `${pos.coords.latitude},${pos.coords.longitude} (${Math.round(dist)}m)`;
-            if(dist<=MAX_RADIUS_METERS) {
-                st.innerText = "✅ OK"; st.className = "text-green-600 font-bold text-xs ml-2";
-                btn.disabled = false; btn.classList.remove('bg-gray-300'); btn.classList.add(type==='in'?'bg-green-600':'bg-red-600');
-            } else {
-                st.innerText = `❌ Jauh (${Math.round(dist)}m)`; st.className = "text-red-600 font-bold text-xs ml-2";
-                btn.disabled = true;
-            }
-        });
-    }
+    function getLocation(t) { const st = document.getElementById('gps-status-'+t), btn = document.getElementById('btn-submit-clock-'+t); st.classList.remove('hidden'); st.innerText = "Mencari..."; navigator.geolocation.getCurrentPosition(pos => { const dist = getDist(pos.coords.latitude, pos.coords.longitude, TARGET_LAT, TARGET_LON); document.getElementById('location-'+t).value = `${pos.coords.latitude},${pos.coords.longitude} (${Math.round(dist)}m)`; if(dist<=MAX_RADIUS_METERS) { st.innerText = "✅ OK"; st.className = "text-green-600 font-bold text-xs ml-2"; btn.disabled = false; btn.classList.remove('bg-gray-300'); btn.classList.add(t==='in'?'bg-green-600':'bg-red-600'); } else { st.innerText = `❌ Jauh (${Math.round(dist)}m)`; st.className = "text-red-600 font-bold text-xs ml-2"; btn.disabled = true; } }); }
     function getDist(lat1,lon1,lat2,lon2) { const R=6371e3, φ1=lat1*Math.PI/180, φ2=lat2*Math.PI/180, Δφ=(lat2-lat1)*Math.PI/180, Δλ=(lon2-lon1)*Math.PI/180, a=Math.sin(Δφ/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 
-    // Submit Logic
-    async function clockIn(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btn-submit-clock-in'); btn.disabled=true; btn.innerText="Sending...";
-        const time = getLocalTimeString();
-        const shift = detectShift(parseInt(time.split(':')[0]));
-        const cash = document.getElementById('cash-in-amount').value;
-        if(currentUser.position==='Kasir' && !cash) { alert("Isi uang kasir!"); btn.disabled=false; return; }
-        
-        const payload = {
-            type:'attendance', employee_id:currentUser.employee_id, name:currentUser.name, position:currentUser.position,
-            attendance_date:getLocalISOString(), clock_in_time:time, attendance_status:calculateLate(shift, time),
-            shift_type:shift, location_in:document.getElementById('location-in').value, selfie_in_url:document.getElementById('selfie-in-data').value,
-            job_desk_in: currentJobDeskInCompleted.length+' selesai', cash_in_hand_start:cash
-        };
-        await postData('create', {payload});
-        hideClockInModal(); await initApp(); updateEmployeeDashboard(); showToast("Clock In Sukses");
-    }
+    async function clockIn(e) { e.preventDefault(); const btn = document.getElementById('btn-submit-clock-in'); btn.disabled=true; btn.innerText="Sending..."; const time = getLocalTimeString(); const shift = detectShift(parseInt(time.split(':')[0])); const cash = document.getElementById('cash-in-amount').value; if(currentUser.position==='Kasir' && !cash) { alert("Isi uang kasir!"); btn.disabled=false; return; } const payload = { type:'attendance', employee_id:currentUser.employee_id, name:currentUser.name, position:currentUser.position, attendance_date:getLocalISOString(), clock_in_time:time, attendance_status:calculateLate(shift, time), shift_type:shift, location_in:document.getElementById('location-in').value, selfie_in_url:document.getElementById('selfie-in-data').value, job_desk_in: currentJobDeskInCompleted.length+' selesai', cash_in_hand_start:cash }; await postData('create', {payload}); hideClockInModal(); await initApp(); updateEmployeeDashboard(); showToast("Clock In Sukses"); }
+    async function clockOut(e) { e.preventDefault(); const btn = document.getElementById('btn-submit-clock-out'); btn.disabled=true; btn.innerText="Sending..."; const cash = document.getElementById('cash-out-amount').value; if(currentUser.position==='Kasir' && !cash) { alert("Isi uang kasir!"); btn.disabled=false; return; } const myAtt = allData.find(d => d.type === 'attendance' && d.employee_id === currentUser.employee_id && !d.clock_out_time); const payload = { type:'attendance', employee_id:currentUser.employee_id, attendance_date:myAtt?myAtt.attendance_date:getLocalISOString(), clock_out_time:getLocalTimeString(), location_out:document.getElementById('location-out').value, selfie_out_url:document.getElementById('selfie-out-data').value, job_desk_out:currentJobDeskOutCompleted.length+' selesai', cash_in_hand_end:cash, is_overtime:document.getElementById('check-overtime').checked, overtime_duration:document.getElementById('overtime-duration').value, overtime_reason:document.getElementById('overtime-reason').value }; await postData('update', {payload}); hideClockOutModal(); await initApp(); updateEmployeeDashboard(); showToast("Clock Out Sukses"); }
 
-    async function clockOut(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btn-submit-clock-out'); btn.disabled=true; btn.innerText="Sending...";
-        const cash = document.getElementById('cash-out-amount').value;
-        if(currentUser.position==='Kasir' && !cash) { alert("Isi uang kasir!"); btn.disabled=false; return; }
-        
-        const myAtt = allData.find(d => d.type === 'attendance' && d.employee_id === currentUser.employee_id && !d.clock_out_time);
-        const payload = {
-            type:'attendance', employee_id:currentUser.employee_id, attendance_date:myAtt?myAtt.attendance_date:getLocalISOString(),
-            clock_out_time:getLocalTimeString(), location_out:document.getElementById('location-out').value,
-            selfie_out_url:document.getElementById('selfie-out-data').value, job_desk_out:currentJobDeskOutCompleted.length+' selesai',
-            cash_in_hand_end:cash, is_overtime:document.getElementById('check-overtime').checked,
-            overtime_duration:document.getElementById('overtime-duration').value, overtime_reason:document.getElementById('overtime-reason').value
-        };
-        await postData('update', {payload});
-        hideClockOutModal(); await initApp(); updateEmployeeDashboard(); showToast("Clock Out Sukses");
-    }
+    function renderRosterGrid() { const header=document.getElementById('roster-header-row'), body=document.getElementById('roster-grid-body'); let emps=allData.filter(d=>d.type==='employee'); emps.sort((a,b)=>(POSITION_RANK[a.position]||99)-(POSITION_RANK[b.position]||99)); const rosters=allData.filter(d=>d.type==='roster'), today=new Date(), day=today.getDay(), diff=today.getDate()-day+(day==0?-6:1)+(currentRosterWeekOffset*7), week=[]; header.innerHTML='<th class="p-2 bg-gray-50 text-xs">Karyawan</th>'; for(let i=0;i<7;i++){ const d=new Date(today); d.setDate(diff+i); const s=d.toLocaleDateString('id-ID',{weekday:'short',day:'numeric'}), iso=new Date(d.getTime()-(d.getTimezoneOffset()*60000)).toISOString().slice(0,10); week.push({disp:s,iso:iso}); header.innerHTML+=`<th class="p-2 text-xs text-center">${s}</th>`; } body.innerHTML=emps.map(e=>`<tr class="hover:bg-gray-50 transition"><td class="p-2 border-r bg-gray-50"><div class="font-bold text-xs text-gray-800">${e.name}</div><div class="text-[10px] text-gray-500 uppercase tracking-wider">${e.position}</div></td>${week.map(w=>{const sh=rosters.find(r=>r.employee_id===e.employee_id && r.roster_date===w.iso), t=sh?sh.shift_type:'Off', st=SHIFT_STYLES[t]; return `<td onclick="cycleShift('${e.employee_id}','${e.name}','${w.iso}','${t}')"><div class="roster-cell ${st} text-center">${t==='Off'?'❌':t}</div></td>`}).join('')}</tr>`).join(''); document.getElementById('roster-period-label').innerText = `${week[0].disp} - ${week[6].disp}`; }
+    function changeRosterWeek(o) { currentRosterWeekOffset+=o; renderRosterGrid(); }
+    async function cycleShift(id,name,date,curr) { const n=SHIFT_TYPES[(SHIFT_TYPES.indexOf(curr)+1)%SHIFT_TYPES.length], t=SHIFT_TIMES[n]; await postData('create', {payload:{type:'roster', employee_id:id, name:name, roster_date:date, shift_type:n, shift_start:t.split('-')[0], shift_end:t.split('-')[1]}}); allData=allData.filter(d=>!(d.type==='roster'&&d.employee_id===id&&d.roster_date===date)); allData.push({type:'roster', employee_id:id, name:name, roster_date:date, shift_type:n}); renderRosterGrid(); }
 
-    // --- OTHER ---
-    function renderRosterGrid() { 
-        const headerRow = document.getElementById('roster-header-row');
-        const body = document.getElementById('roster-grid-body');
-        
-        let emps = allData.filter(d => d.type === 'employee');
-        
-        emps.sort((a, b) => {
-            const rankA = POSITION_RANK[a.position] || 99;
-            const rankB = POSITION_RANK[b.position] || 99;
-            if (rankA !== rankB) return rankA - rankB;
-            return a.name.localeCompare(b.name);
-        });
-
-        const rosters = allData.filter(d => d.type === 'roster');
-
-        const today = new Date();
-        const dayOfWeek = today.getDay(); 
-        const startDiff = today.getDate() - dayOfWeek + (dayOfWeek == 0 ? -6 : 1) + (currentRosterWeekOffset * 7);
-        
-        const weekDates = [];
-        headerRow.innerHTML = '<th class="p-2 bg-gray-50 text-xs">Karyawan</th>';
-        
-        for (let i=0; i<7; i++) {
-            const d = new Date(today);
-            d.setDate(startDiff + i);
-            const dateStr = d.toLocaleDateString('id-ID', {weekday:'short', day:'numeric'});
-            const offset = d.getTimezoneOffset() * 60000;
-            const isoDate = new Date(d.getTime() - offset).toISOString().slice(0,10);
-            
-            weekDates.push({ display: dateStr, iso: isoDate });
-            headerRow.innerHTML += `<th class="p-2 text-xs text-center">${dateStr}</th>`;
-        }
-
-        body.innerHTML = emps.map(e => {
-            let cells = `
-                <td class="p-2 border-r bg-gray-50">
-                    <div class="font-bold text-xs text-gray-800">${e.name}</div>
-                    <div class="text-[10px] text-gray-500 uppercase tracking-wider">${e.position}</div>
-                </td>`;
-                
-            weekDates.forEach(dt => {
-                const shift = rosters.find(r => r.employee_id === e.employee_id && r.roster_date === dt.iso);
-                const shiftType = shift ? shift.shift_type : 'Off';
-                const style = SHIFT_STYLES[shiftType];
-                cells += `<td onclick="cycleShift('${e.employee_id}', '${e.name}', '${dt.iso}', '${shiftType}')"><div class="roster-cell ${style} text-center">${shiftType === 'Off' ? '❌' : shiftType}</div></td>`;
-            });
-            return `<tr class="hover:bg-gray-50 transition">${cells}</tr>`;
-        }).join('');
-        
-        document.getElementById('roster-period-label').innerText = `${weekDates[0].display} - ${weekDates[6].display}`;
-    }
-
-    function changeRosterWeek(o) { currentRosterWeekOffset += o; renderRosterGrid(); }
-    
-    // UPDATED: EMPLOYEE ROSTER WITH SWAP BUTTON
-    function renderEmployeeRoster() {
-        const r = allData.filter(d => d.type === 'roster' && d.employee_id === currentUser.employee_id);
-        const today = getLocalISOString();
-        
-        // Filter Future Shifts only for swapping
-        const futureShifts = r.filter(i => i.roster_date >= today && i.shift_type !== 'Off');
-        
-        futureShifts.sort((a,b) => new Date(a.roster_date) - new Date(b.roster_date));
-
-        const html = futureShifts.map(i => {
-            const dateObj = new Date(i.roster_date);
-            const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
-            let timeRange = '';
-            let styleClass = '';
-            let textClass = '';
-            let badgeClass = '';
-            let icon = '';
-
-            switch(i.shift_type) {
-                case 'Pagi': 
-                    timeRange = '00:00 - 08:00'; 
-                    styleClass = 'style-pagi'; textClass = 'text-pagi'; badgeClass = 'badge-pagi'; icon = '🌅';
-                    break;
-                case 'Siang': 
-                    timeRange = '08:00 - 16:00'; 
-                    styleClass = 'style-siang'; textClass = 'text-siang'; badgeClass = 'badge-siang'; icon = '☀️';
-                    break;
-                case 'Malam': 
-                    timeRange = '16:00 - 24:00'; 
-                    styleClass = 'style-malam'; textClass = 'text-malam'; badgeClass = 'badge-malam'; icon = '🌙';
-                    break;
-            }
-
-            return `
-            <div class="bg-white p-4 rounded-xl shadow-sm border shift-card ${styleClass} flex justify-between items-center">
-                <div>
-                    <div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">${dayName}</div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">${icon}</span>
-                        <div>
-                            <div class="font-bold text-lg text-gray-800">${i.shift_type}</div>
-                            <div class="text-xs ${textClass} font-bold">${timeRange}</div>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="openSwapModal('${i.roster_date}', '${i.shift_type}')" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm hover:bg-indigo-200">
-                    🔄 Tawarkan
-                </button>
-            </div>`;
-        }).join('');
-
-        document.getElementById('employee-roster-list').innerHTML = html || '<div class="text-center p-8 text-gray-400">Tidak ada jadwal aktif.</div>';
-    }
-
-    // --- SWAP FUNCTIONS ---
-    function openSwapModal(date, type) {
-        document.getElementById('swap-roster-date').value = date;
-        document.getElementById('swap-shift-type').value = type;
-        document.getElementById('swap-date-disp').innerText = date;
-        document.getElementById('swap-shift-disp').innerText = type;
-        document.getElementById('swap-modal').classList.remove('hidden');
-    }
-
-    async function submitSwapRequest() {
-        const btn = document.getElementById('btn-submit-swap');
-        btn.disabled = true; btn.innerText = 'Posting...';
-        
-        const payload = {
-            type: 'swap_request',
-            roster_date: document.getElementById('swap-roster-date').value,
-            shift_type: document.getElementById('swap-shift-type').value,
-            employee_id: currentUser.employee_id,
-            name: currentUser.name,
-            reason: document.getElementById('swap-reason').value
-        };
-
-        const res = await postData('create', { payload });
-        if(res.isOk) {
-            showToast("Tawaran berhasil diposting!");
-            document.getElementById('swap-modal').classList.add('hidden');
-            await initApp();
-            showEmployeeTab('roster'); // Refresh
-        } else {
-            showToast("Gagal posting tawaran", "error");
-        }
-        btn.disabled = false; btn.innerText = 'Posting Tawaran';
-    }
-
-    function renderSwapMarket() {
-        const swaps = allData.filter(d => d.type === 'swap' && d.status === 'Open' && d.req_id !== currentUser.employee_id);
-        const list = document.getElementById('employee-swap-list');
-        
-        if (swaps.length === 0) {
-            list.innerHTML = '<div class="text-center text-gray-400 py-4 text-xs italic">Tidak ada tawaran shift saat ini.</div>';
-            return;
-        }
-
-        list.innerHTML = swaps.map(s => `
-            <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 flex justify-between items-center shadow-sm">
-                <div>
-                    <div class="font-bold text-gray-800 text-sm">${s.req_name}</div>
-                    <div class="text-xs text-gray-600 font-bold">${s.roster_date} (${s.shift_type})</div>
-                    <div class="text-[10px] text-gray-500 italic">"${s.reason}"</div>
-                </div>
-                <button onclick="takeSwap('${s.swap_id}', '${s.req_name}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold shadow hover:bg-green-700">
-                    Ambil
-                </button>
-            </div>
-        `).join('');
-    }
-
-    async function takeSwap(swapId, ownerName) {
-        if(!confirm(`Ambil shift milik ${ownerName}? Jadwal Anda akan diperbarui.`)) return;
-        
-        const payload = {
-            type: 'swap_take',
-            swap_id: swapId,
-            taker_id: currentUser.employee_id,
-            taker_name: currentUser.name
-        };
-
-        const res = await postData('update', { payload });
-        if(res.isOk) {
-            showToast("Shift berhasil diambil!");
-            await initApp();
-            showEmployeeTab('roster');
-        } else {
-            showToast(res.message, "error");
-        }
-    }
-
-    function renderEmployeeLeaveList() {
-        const l = allData.filter(d => d.type === 'leave' && d.employee_id === currentUser.employee_id);
-        document.getElementById('employee-leave-list').innerHTML = l.map(i => `<div class="bg-white p-3 border rounded"><b>${i.leave_type}</b> <span class="text-xs text-gray-500">${i.status}</span><div class="text-xs">${i.start_date}</div></div>`).join('');
+    function renderEmployeeRoster() { 
+        const r = allData.filter(d => d.type === 'roster' && d.employee_id === currentUser.employee_id && d.roster_date >= getLocalISOString() && d.shift_type !== 'Off');
+        r.sort((a,b)=>new Date(a.roster_date)-new Date(b.roster_date));
+        document.getElementById('employee-roster-list').innerHTML = r.length ? r.map(i => {
+            const d = new Date(i.roster_date).toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+            let t='', st='', ic=''; switch(i.shift_type){case 'Pagi':t='00-08';st='style-pagi';ic='🌅';break;case 'Siang':t='08-16';st='style-siang';ic='☀️';break;case 'Malam':t='16-24';st='style-malam';ic='🌙';break;}
+            return `<div class="bg-white p-4 rounded-xl shadow-sm border shift-card ${st} flex justify-between items-center"><div><div class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">${d}</div><div class="flex items-center gap-2"><span class="text-2xl">${ic}</span><div><div class="font-bold text-lg text-gray-800">${i.shift_type}</div><div class="text-xs font-bold">${t}</div></div></div></div><button onclick="openSwapModal('${i.roster_date}','${i.shift_type}')" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm hover:bg-indigo-200">🔄 Tawarkan</button></div>`;
+        }).join('') : '<div class="text-center p-8 text-gray-400">Tidak ada jadwal aktif.</div>';
     }
     
-    // Correction Logic
-    function openCorrectionModal(id, date) {
-        const d = allData.find(x => x.employee_id===id && x.attendance_date===date);
-        if(!d) return;
-        document.getElementById('correct-emp-id').value = id;
-        document.getElementById('correct-date').value = date;
-        document.getElementById('correct-name').value = d.name;
-        document.getElementById('correct-in-time').value = d.clock_in_time;
-        document.getElementById('correct-out-time').value = d.clock_out_time;
-        document.getElementById('correct-status').value = d.attendance_status;
-        document.getElementById('correction-modal').classList.remove('hidden');
-    }
-    async function cycleShift(empId, empName, date, currentType) {
-      const currentIndex = SHIFT_TYPES.indexOf(currentType);
-      const nextIndex = (currentIndex + 1) % SHIFT_TYPES.length;
-      const nextType = SHIFT_TYPES[nextIndex];
-      const nextTime = SHIFT_TIMES[nextType];
-      
-      const payload = {
-        type: 'roster', employee_id: empId, name: empName, roster_date: date,
-        shift_type: nextType, shift_start: nextTime.split('-')[0] || '', shift_end: nextTime.split('-')[1] || ''
-      };
-      
-      await postData('create', { payload });
-      allData = allData.filter(d => !(d.type === 'roster' && d.employee_id === empId && d.roster_date === date));
-      allData.push(payload);
-      renderRosterGrid();
-    }
+    function openSwapModal(d,t) { document.getElementById('swap-roster-date').value=d; document.getElementById('swap-shift-type').value=t; document.getElementById('swap-date-disp').innerText=d; document.getElementById('swap-shift-disp').innerText=t; document.getElementById('swap-modal').classList.remove('hidden'); }
+    async function submitSwapRequest() { const btn=document.getElementById('btn-submit-swap'); btn.disabled=true; btn.innerText='Posting...'; const payload={type:'swap_request', roster_date:document.getElementById('swap-roster-date').value, shift_type:document.getElementById('swap-shift-type').value, employee_id:currentUser.employee_id, name:currentUser.name, reason:document.getElementById('swap-reason').value}; const res=await postData('create',{payload}); if(res.isOk){showToast("Tawaran diposting!"); document.getElementById('swap-modal').classList.add('hidden'); await initApp(); showEmployeeTab('roster');} else {showToast("Gagal","error");} btn.disabled=false; btn.innerText='Posting'; }
+    function renderSwapMarket() { const s=allData.filter(d=>d.type==='swap' && d.status==='Open' && d.req_id!==currentUser.employee_id); document.getElementById('employee-swap-list').innerHTML = s.length ? s.map(i=>`<div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 flex justify-between items-center shadow-sm"><div><div class="font-bold text-gray-800 text-sm">${i.req_name}</div><div class="text-xs text-gray-600 font-bold">${i.roster_date} (${i.shift_type})</div><div class="text-[10px] text-gray-500 italic">"${i.reason}"</div></div><button onclick="takeSwap('${i.swap_id}','${i.req_name}')" class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold shadow hover:bg-green-700">Ambil</button></div>`).join('') : '<div class="text-center text-gray-400 py-4 text-xs italic">Tidak ada tawaran.</div>'; }
+    async function takeSwap(id,name) { if(!confirm(`Ambil shift ${name}?`))return; const res=await postData('update',{payload:{type:'swap_take', swap_id:id, taker_id:currentUser.employee_id, taker_name:currentUser.name}}); if(res.isOk){showToast("Shift diambil!"); await initApp(); showEmployeeTab('roster');} else {showToast(res.message,"error");} }
 
-    async function submitCorrection(e) {
-        e.preventDefault();
-        const p = { type:'attendance', employee_id:document.getElementById('correct-emp-id').value, attendance_date:document.getElementById('correct-date').value, clock_in_time:document.getElementById('correct-in-time').value, clock_out_time:document.getElementById('correct-out-time').value, attendance_status:document.getElementById('correct-status').value, notes_in:'Dikoreksi Manager' };
-        await postData('update', {payload:p});
-        document.getElementById('correction-modal').classList.add('hidden'); await initApp(); renderManagerAttendance();
-    }
+    function openCorrectionModal(id, date) { const d = allData.find(x => x.employee_id===id && x.attendance_date===date); if(!d) return; document.getElementById('correct-emp-id').value = id; document.getElementById('correct-date').value = date; document.getElementById('correct-name').value = d.name; document.getElementById('correct-in-time').value = d.clock_in_time; document.getElementById('correct-out-time').value = d.clock_out_time; document.getElementById('correct-status').value = d.attendance_status; document.getElementById('correction-modal').classList.remove('hidden'); }
+    async function submitCorrection(e) { e.preventDefault(); const p = { type:'attendance', employee_id:document.getElementById('correct-emp-id').value, attendance_date:document.getElementById('correct-date').value, clock_in_time:document.getElementById('correct-in-time').value, clock_out_time:document.getElementById('correct-out-time').value, attendance_status:document.getElementById('correct-status').value, notes_in:'Dikoreksi Manager' }; await postData('update', {payload:p}); document.getElementById('correction-modal').classList.add('hidden'); await initApp(); renderManagerAttendance(); }
 
     document.addEventListener('DOMContentLoaded', initApp);
   </script>
