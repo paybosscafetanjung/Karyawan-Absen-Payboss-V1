@@ -34,34 +34,26 @@
     .tab-button.active { background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); color: white; }
     .tab-button:not(.active) { background: white; color: #6b7280; }
     
-    /* Shift Colors & Badges */
+    /* Shift Colors & Badges (Card Style) */
     .shift-card { transition: all 0.3s; border-left: 6px solid; }
     .shift-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     
-    /* Pagi: Biru Laut Cerah */
-    .style-pagi { border-color: #00B4D8; background: #E0F7FA; }
-    .text-pagi { color: #0077B6; }
-    .badge-pagi { background: #CAF0F8; color: #0077B6; border: 1px solid #90E0EF; }
+    /* STYLE UNTUK ROSTER GRID (KONTRAS) */
+    .roster-cell { cursor: pointer; transition: all 0.2s; border-radius: 8px; padding: 8px 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .roster-cell:hover { transform: scale(1.1); z-index: 10; }
 
-    /* Siang: Kuning/Oranye Cerah */
-    .style-siang { border-color: #FF9F1C; background: #FFF3E0; }
-    .text-siang { color: #E65100; }
-    .badge-siang { background: #FFE0B2; color: #E65100; border: 1px solid #FFCC80; }
+    /* Pagi: Biru */
+    .shift-pagi { background: #E0F7FA; color: #006064; border: 2px solid #00BCD4; }
+    /* Siang: Oranye */
+    .shift-siang { background: #FFF3E0; color: #E65100; border: 2px solid #FF9800; }
+    /* Malam: Ungu */
+    .shift-malam { background: #F3E5F5; color: #4A148C; border: 2px solid #9C27B0; }
+    /* Off: Merah Muda/Abu */
+    .shift-off { background: #FFEBEE; color: #C62828; border: 2px solid #EF9A9A; opacity: 0.7; }
 
-    /* Malam: Ungu Gelap */
-    .style-malam { border-color: #5A189A; background: #F3E5F5; }
-    .text-malam { color: #4A148C; }
-    .badge-malam { background: #E1BEE7; color: #4A148C; border: 1px solid #CE93D8; }
-
-    /* Off: Abu-abu */
-    .style-off { border-color: #6C757D; background: #F8F9FA; }
-    .text-off { color: #495057; }
-    .badge-off { background: #E9ECEF; color: #495057; border: 1px solid #CED4DA; }
-
-    /* Roster Grid */
-    .roster-table th, .roster-table td { border: 1px solid #e5e7eb; padding: 8px; text-align: center; min-width: 80px; }
+    /* Roster Table Layout */
+    .roster-table th, .roster-table td { border: 1px solid #e5e7eb; padding: 6px; text-align: center; min-width: 70px; }
     .roster-table th:first-child, .roster-table td:first-child { position: sticky; left: 0; background: white; z-index: 10; border-right: 2px solid #e5e7eb; min-width: 120px; text-align: left; }
-    .roster-cell { cursor: pointer; transition: all 0.2s; border-radius: 8px; padding: 8px 4px; font-size: 12px; font-weight: bold; }
     
     /* Camera */
     .camera-view { width: 100%; border-radius: 12px; background: #000; overflow: hidden; position: relative; min-height: 240px; }
@@ -150,9 +142,9 @@
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Kolom Pagi -->
-            <div class="bg-blue-50 rounded-xl p-4 border border-blue-100 shadow-sm h-full">
-                <h3 class="font-bold text-blue-800 mb-3 flex items-center gap-2 border-b border-blue-200 pb-2">
-                    🌅 Pagi <span class="text-xs bg-blue-200 px-2 py-0.5 rounded-full ml-auto" id="count-pagi">0</span>
+            <div class="bg-cyan-50 rounded-xl p-4 border border-cyan-100 shadow-sm h-full">
+                <h3 class="font-bold text-cyan-800 mb-3 flex items-center gap-2 border-b border-cyan-200 pb-2">
+                    🌅 Pagi <span class="text-xs bg-cyan-200 px-2 py-0.5 rounded-full ml-auto" id="count-pagi">0</span>
                 </h3>
                 <div id="monitor-pagi" class="space-y-3 min-h-[100px]"></div>
             </div>
@@ -213,7 +205,7 @@
         </div>
     </div>
     
-    <!-- TAB: Roster -->
+    <!-- TAB: Roster (JADWAL KONTRAS) -->
     <div id="manager-tab-roster" class="tab-content hidden">
       <div class="bg-white rounded-2xl p-4 card-shadow">
         <div class="flex justify-between items-center mb-4">
@@ -230,10 +222,11 @@
                 <tbody id="roster-grid-body"></tbody>
             </table>
         </div>
-        <div class="mt-4 flex gap-4 text-xs flex-wrap">
-            <span class="flex items-center gap-1"><div class="w-3 h-3 bg-[#E0F7FA] border border-[#00B4D8]"></div> Pagi (00-08)</span>
-            <span class="flex items-center gap-1"><div class="w-3 h-3 bg-[#FFF3E0] border border-[#FF9F1C]"></div> Siang (08-16)</span>
-            <span class="flex items-center gap-1"><div class="w-3 h-3 bg-[#F3E5F5] border border-[#5A189A]"></div> Malam (16-24)</span>
+        <div class="mt-4 flex flex-wrap gap-4 text-xs">
+            <span class="flex items-center gap-1 font-bold text-cyan-800"><div class="w-3 h-3 bg-[#E0F7FA] border-2 border-[#00BCD4]"></div> Pagi (00-08)</span>
+            <span class="flex items-center gap-1 font-bold text-orange-800"><div class="w-3 h-3 bg-[#FFF3E0] border-2 border-[#FF9800]"></div> Siang (08-16)</span>
+            <span class="flex items-center gap-1 font-bold text-purple-800"><div class="w-3 h-3 bg-[#F3E5F5] border-2 border-[#9C27B0]"></div> Malam (16-24)</span>
+            <span class="flex items-center gap-1 font-bold text-gray-600"><div class="w-3 h-3 bg-[#FFEBEE] border-2 border-[#EF9A9A]"></div> OFF</span>
         </div>
       </div>
     </div>
@@ -550,7 +543,7 @@
         document.getElementById('payroll-table-body').innerHTML = html || '<tr><td colspan="4" class="p-4 text-center">Tidak ada data kerja.</td></tr>';
     }
 
-    // MONITOR 3 COLUMNS (NO CHANGE FROM PREVIOUS, JUST KEPT SAFE)
+    // MONITOR 3 COLUMNS
     function renderShiftMonitor() {
         const today = getLocalISOString();
         document.getElementById('monitor-date-display').innerText = today;
@@ -885,7 +878,7 @@
         hideClockOutModal(); await initApp(); updateEmployeeDashboard(); showToast("Clock Out Sukses");
     }
 
-    // --- OTHER ---
+    // --- Roster Grid Renderer (Style Updated) ---
     function renderRosterGrid() { 
         const headerRow = document.getElementById('roster-header-row');
         const body = document.getElementById('roster-grid-body');
@@ -940,7 +933,7 @@
 
     function changeRosterWeek(o) { currentRosterWeekOffset += o; renderRosterGrid(); }
     
-    // UPDATED: EMPLOYEE ROSTER DISPLAY WITH COLORS & DAYS
+    // UPDATED: EMPLOYEE ROSTER DISPLAY
     function renderEmployeeRoster() {
         const r = allData.filter(d => d.type === 'roster' && d.employee_id === currentUser.employee_id);
         
