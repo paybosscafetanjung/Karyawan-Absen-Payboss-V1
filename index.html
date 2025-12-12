@@ -56,6 +56,11 @@
     video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
     .captured-photo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; display: none; }
     .hidden { display: none; }
+
+    /* Hall of Fame Gold/Silver/Bronze */
+    .medal-1 { font-size: 2rem; text-shadow: 0 0 10px gold; }
+    .medal-2 { font-size: 1.5rem; text-shadow: 0 0 5px silver; }
+    .medal-3 { font-size: 1.2rem; text-shadow: 0 0 5px #cd7f32; }
   </style>
  </head>
  <body class="bg-gray-100 select-none">
@@ -88,7 +93,7 @@
    </div>
   </div>
 
-  <!-- DASHBOARDS (MANAGER & EMPLOYEE SAME AS BEFORE, JUST RE-INSERTED FOR COMPLETENESS) -->
+  <!-- MANAGER DASHBOARD -->
   <div id="manager-dashboard" class="hidden page-container">
    <header class="bg-white shadow-lg border-b-4 border-indigo-600 p-6 sticky top-0 z-20">
     <div class="flex justify-between items-center max-w-7xl mx-auto">
@@ -147,18 +152,36 @@
         <div class="mt-4 flex flex-wrap gap-4 text-xs"><span class="flex items-center gap-1 font-bold text-cyan-800"><div class="w-3 h-3 bg-[#E0F7FA] border-2 border-[#00BCD4]"></div> Pagi</span><span class="flex items-center gap-1 font-bold text-orange-800"><div class="w-3 h-3 bg-[#FFF3E0] border-2 border-[#FF9800]"></div> Siang</span><span class="flex items-center gap-1 font-bold text-purple-800"><div class="w-3 h-3 bg-[#F3E5F5] border-2 border-[#9C27B0]"></div> Malam</span></div>
       </div>
     </div>
+    
+    <!-- UPDATED: TAB REPORT WITH LEADERBOARD (HALL OF FAME MANAGER) -->
     <div id="manager-tab-report" class="tab-content hidden">
         <div class="bg-white rounded-2xl p-6 card-shadow">
-            <h3 class="font-bold mb-6 text-xl">📈 Analitik & Laporan</h3>
+            <h3 class="font-bold mb-6 text-xl">🏆 Hall of Fame & Analitik</h3>
             <div class="flex flex-wrap gap-4 mb-6"><div class="flex-1 min-w-[150px]"><label class="block text-xs font-bold text-gray-500 mb-1">Dari</label><input type="date" id="report-start" class="w-full p-2 border rounded-lg text-sm"></div><div class="flex-1 min-w-[150px]"><label class="block text-xs font-bold text-gray-500 mb-1">Sampai</label><input type="date" id="report-end" class="w-full p-2 border rounded-lg text-sm"></div><button onclick="generateReport()" class="w-full md:w-auto bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition self-end h-[38px] flex items-center justify-center">Tampilkan</button></div>
+            
+            <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div class="bg-gradient-to-br from-green-500 to-emerald-700 rounded-xl p-4 text-white shadow-lg"><div class="flex justify-between items-start"><div><p class="text-xs font-bold opacity-80 uppercase">🏆 Paling Rajin</p><h4 id="stat-top-employee" class="text-lg font-bold mt-1">-</h4></div><div class="text-2xl opacity-50">🥇</div></div><p id="stat-top-employee-detail" class="text-xs mt-2 opacity-90 font-mono">0 Kehadiran</p></div>
                 <div class="bg-gradient-to-br from-red-500 to-rose-700 rounded-xl p-4 text-white shadow-lg"><div class="flex justify-between items-start"><div><p class="text-xs font-bold opacity-80 uppercase">🐢 Sering Terlambat</p><h4 id="stat-late-employee" class="text-lg font-bold mt-1">-</h4></div><div class="text-2xl opacity-50">⚠️</div></div><p id="stat-late-count" class="text-xs mt-2 opacity-90 font-mono">0 Kali</p></div>
                 <div class="bg-gradient-to-br from-blue-500 to-indigo-700 rounded-xl p-4 text-white shadow-lg"><div class="flex justify-between items-start"><div><p class="text-xs font-bold opacity-80 uppercase">⏱️ Total Jam Tim</p><h4 id="stat-total-hours" class="text-lg font-bold mt-1">0 Jam</h4></div><div class="text-2xl opacity-50">⏳</div></div><p class="text-xs mt-2 opacity-90 font-mono">Periode Terpilih</p></div>
             </div>
+            
+            <!-- Top 3 Leaderboards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-xl border shadow-sm">
+                    <h4 class="font-bold text-gray-700 mb-4 flex items-center gap-2 border-b pb-2">🏆 Paling Rajin (Shift)</h4>
+                    <div id="top-3-attendance" class="space-y-2"><div class="text-center text-gray-400 text-xs py-4">Data belum dimuat.</div></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border shadow-sm">
+                    <h4 class="font-bold text-gray-700 mb-4 flex items-center gap-2 border-b pb-2">🔥 Paling Produktif (Jam)</h4>
+                    <div id="top-3-hours" class="space-y-2"><div class="text-center text-gray-400 text-xs py-4">Data belum dimuat.</div></div>
+                </div>
+            </div>
+
             <div class="overflow-x-auto border rounded-xl"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-gray-50 text-gray-700"><th class="p-3 border-b">Nama</th><th class="p-3 border-b text-center">Hadir</th><th class="p-3 border-b text-center">Telat</th><th class="p-3 border-b text-center">Jam Kerja</th></tr></thead><tbody id="report-table-body" class="text-gray-600"><tr><td colspan="4" class="p-8 text-center text-gray-400">Silakan pilih rentang tanggal.</td></tr></tbody></table></div>
         </div>
     </div>
+    
     <div id="manager-tab-leave" class="tab-content hidden"><div class="bg-white rounded-2xl p-6 card-shadow"><h2 class="font-bold mb-4">Daftar Pengajuan Izin</h2><div id="manager-leave-list" class="space-y-3"></div></div></div>
    </div>
   </div>
@@ -173,14 +196,45 @@
     </div>
     <div id="employee-content">
      <div id="employee-tab-attendance" class="tab-content">
-      <div id="active-session-alert" class="hidden mb-4 bg-orange-50 border-l-4 border-orange-500 p-3 rounded-r-xl shadow-sm"><p class="font-bold text-orange-800 text-sm">⚠️ Shift Belum Selesai</p><p class="text-xs text-orange-600">Anda belum Clock Out.</p></div>
+      <div id="active-session-alert" class="hidden mb-4 bg-orange-50 border-l-4 border-orange-500 p-3 rounded-r-xl shadow-sm"><p class="font-bold text-orange-800 text-sm">⚠️ Shift Belum Selesai</p><p class="text-xs text-orange-600">Anda belum Clock Out dari sesi sebelumnya.</p></div>
       <div class="grid grid-cols-2 gap-4 mb-6"><button id="clock-in-btn" onclick="showClockInModal()" class="bg-white p-4 rounded-2xl shadow-lg text-center active:scale-95 transition border-b-4 border-green-500"><div class="text-4xl mb-2">🟢</div><h3 class="font-bold text-gray-700">Masuk</h3></button><button id="clock-out-btn" onclick="showClockOutModal()" class="bg-white p-4 rounded-2xl shadow-lg text-center active:scale-95 transition border-b-4 border-red-500 opacity-50 pointer-events-none"><div class="text-4xl mb-2">🔴</div><h3 class="font-bold text-gray-700">Pulang</h3></button></div>
+      
+      <!-- HALL OF FAME BUTTON FOR EMPLOYEE -->
+      <div class="mb-6 px-2">
+          <button onclick="showHallOfFame()" class="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white p-3 rounded-xl shadow-lg font-bold flex items-center justify-center gap-2 transform active:scale-95 transition">
+             <span>🏆</span> Lihat Hall of Fame Bulan Ini
+          </button>
+      </div>
+
       <h3 class="font-bold text-gray-700 mb-2 px-2">Riwayat Terbaru</h3><div id="employee-attendance-list" class="space-y-3 pb-20"></div>
      </div>
      <div id="employee-tab-roster" class="tab-content hidden"><h3 class="font-bold mb-4 text-gray-800 px-1">Jadwal Shift Saya</h3><div id="employee-roster-list" class="grid grid-cols-1 gap-3 mb-8"></div><h3 class="font-bold mb-4 text-gray-800 px-1 border-t pt-4">🔄 Bursa Tukar Shift</h3><div id="employee-swap-list" class="space-y-3"><div class="text-center text-gray-400 text-sm py-4">Memuat tawaran...</div></div></div>
      <div id="employee-tab-leave" class="tab-content hidden"><div class="bg-white rounded-2xl p-6 shadow-md mb-6"><h3 class="font-bold mb-3">Form Izin</h3><form onsubmit="submitLeaveRequest(event)" class="space-y-3"><select id="leave-type" class="w-full p-3 border rounded-xl bg-gray-50 text-sm"><option>Sakit</option><option>Izin</option><option>Cuti</option></select><div class="grid grid-cols-2 gap-2"><input type="date" id="leave-start-date" class="w-full p-2 border rounded-xl text-sm"><input type="date" id="leave-end-date" class="w-full p-2 border rounded-xl text-sm"></div><textarea id="leave-reason" class="w-full p-3 border rounded-xl text-sm" placeholder="Alasan..."></textarea><button type="submit" id="btn-submit-leave" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl shadow">Kirim</button></form></div><div id="employee-leave-list" class="space-y-3"></div></div>
     </div>
    </div>
+  </div>
+
+  <!-- HALL OF FAME MODAL -->
+  <div id="hof-modal" class="modal-overlay hidden">
+    <div class="modal-content bg-gradient-to-b from-blue-900 to-indigo-900 text-white border-2 border-yellow-500">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-yellow-400">🏆 Hall of Fame</h2>
+        <p class="text-xs text-blue-200 uppercase tracking-widest mt-1">Bulan Ini</p>
+      </div>
+      
+      <div class="space-y-6">
+        <div class="bg-white bg-opacity-10 p-4 rounded-xl border border-white border-opacity-20">
+            <h3 class="font-bold text-yellow-300 mb-3 text-center border-b border-white border-opacity-20 pb-2">🌟 Paling Rajin (Shift)</h3>
+            <div id="hof-list-attendance" class="space-y-2 text-sm"></div>
+        </div>
+        <div class="bg-white bg-opacity-10 p-4 rounded-xl border border-white border-opacity-20">
+            <h3 class="font-bold text-orange-300 mb-3 text-center border-b border-white border-opacity-20 pb-2">🔥 Paling Produktif (Jam)</h3>
+            <div id="hof-list-hours" class="space-y-2 text-sm"></div>
+        </div>
+      </div>
+
+      <button onclick="document.getElementById('hof-modal').classList.add('hidden')" class="w-full mt-6 bg-white text-indigo-900 font-bold py-3 rounded-xl">Tutup</button>
+    </div>
   </div>
 
   <!-- MODALS -->
@@ -232,7 +286,6 @@
         const newQueue = [];
         for (const item of queue) {
             try {
-                // Gunakan fetch langsung tanpa pembungkus postData untuk kontrol error lebih baik
                 const res = await fetch(API_URL, { 
                     method: 'POST', 
                     redirect: 'follow', 
@@ -240,9 +293,9 @@
                     body: JSON.stringify(item) 
                 });
                 const json = await res.json();
-                if (!json.isOk) newQueue.push(item); // Gagal server, keep
+                if (!json.isOk) newQueue.push(item); 
             } catch (e) {
-                newQueue.push(item); // Masih gagal koneksi, keep
+                newQueue.push(item);
             }
         }
 
@@ -251,19 +304,46 @@
         
         if (queue.length > newQueue.length) {
             showToast("Data offline berhasil disinkronkan!", "success");
-            await initApp(); // Refresh data
+            await initApp(); 
         }
     }
 
     function initNotifications() { if (!("Notification" in window)) return; if (Notification.permission !== "granted" && Notification.permission !== "denied") Notification.requestPermission(); }
+    
+    // UPDATED: REMINDER 20 MINS BEFORE START & END
     function checkShiftReminders() {
         if (Notification.permission !== "granted" || !currentUser) return;
-        const today = getLocalISOString(), now = new Date(), currentHour = now.getHours(), currentMin = now.getMinutes();
+        
+        const today = getLocalISOString();
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMin = now.getMinutes();
+        const nowMins = currentHour * 60 + currentMin;
+        
+        // Cari jadwal hari ini
         const myRoster = allData.find(d => d.type === 'roster' && d.employee_id === currentUser.employee_id && d.roster_date === today);
+        
         if (myRoster && myRoster.shift_type !== 'Off') {
             const rule = SHIFT_RULES[myRoster.shift_type];
-            const startMins = rule.start_h * 60 + rule.start_m, nowMins = currentHour * 60 + currentMin;
-            if (startMins - nowMins === 30) new Notification("⏰ Pengingat Shift", { body: `Halo ${currentUser.name}, Shift ${myRoster.shift_type} mulai 30 menit lagi!`, icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041891.png' });
+            
+            // 1. Reminder Masuk (20 Menit Sebelum)
+            const startMins = rule.start_h * 60 + rule.start_m;
+            if (startMins - nowMins === 20) { 
+                 new Notification("⏰ Siap-siap Kerja!", { 
+                     body: `Halo ${currentUser.name}, Shift ${myRoster.shift_type} dimulai 20 menit lagi. Jangan lupa Clock In!`,
+                     icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041891.png'
+                 });
+            }
+
+            // 2. Reminder Pulang (20 Menit Sebelum)
+            let endMins = rule.end_h * 60 + rule.end_m;
+            
+            if (endMins - nowMins === 20) {
+                 new Notification("🏠 Siap-siap Pulang!", { 
+                     body: `Halo ${currentUser.name}, Shift ${myRoster.shift_type} berakhir 20 menit lagi. Jangan lupa Clock Out!`,
+                     icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041891.png'
+                 });
+            }
         }
     }
 
@@ -291,12 +371,10 @@
 
     // --- CORE & MODIFIED POSTDATA ---
     async function postData(action, payload = {}) {
-        // Cek koneksi dulu sebelum kirim
         if (!navigator.onLine) {
-            // Hanya simpan aksi penting (Attendance/Request) ke queue
             if (['create', 'update'].includes(action) && ['attendance', 'swap_request', 'swap_take'].includes(payload.type)) {
                 await saveToQueue({ action, ...payload });
-                return { isOk: true, message: "Disimpan Offline" }; // Fake success agar UI tidak error
+                return { isOk: true, message: "Disimpan Offline" }; 
             }
             return { isOk: false, message: "Koneksi terputus. Fitur ini butuh internet." };
         }
@@ -305,7 +383,6 @@
             const res = await fetch(API_URL, { method: 'POST', redirect: 'follow', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action, ...payload }) });
             return await res.json();
         } catch (e) {
-            // Jika fetch gagal (network error saat mencoba kirim)
             if (['create', 'update'].includes(action)) {
                 await saveToQueue({ action, ...payload });
                 return { isOk: true, message: "Disimpan Offline (Net Error)" };
@@ -413,6 +490,7 @@
     }
     async function approveLeave(id, date, status) { const payload = { type: 'leave', employee_id: id, start_date: date, status: status, approved_by: 'Manager', approved_at: new Date().toISOString() }; const res = await postData('update', { payload }); if(res.isOk) { showToast(`Izin ${status}`); await initApp(); updateManagerDashboard(); } else { showToast("Gagal", "error"); } }
 
+    // --- ENHANCED REPORTING LOGIC & HALL OF FAME ---
     function generateReport() {
         const start = document.getElementById('report-start').value, end = document.getElementById('report-end').value;
         if(!start || !end) return alert("Pilih tanggal!");
@@ -425,11 +503,51 @@
             if(a.clock_in_time && a.clock_out_time) report[a.employee_id].workMinutes += timeToHours(a.clock_in_time, a.clock_out_time) * 60;
         });
         const arr = Object.values(report);
-        const top = arr.sort((a,b)=>b.count-a.count)[0], late = [...arr].sort((a,b)=>b.lateCount-a.lateCount)[0], mins = arr.reduce((s,i)=>s+i.workMinutes,0);
+        const top = [...arr].sort((a,b)=>b.count-a.count)[0], late = [...arr].sort((a,b)=>b.lateCount-a.lateCount)[0], mins = arr.reduce((s,i)=>s+i.workMinutes,0);
         document.getElementById('stat-top-employee').innerText = top ? top.name : '-'; document.getElementById('stat-top-employee-detail').innerText = top ? `${top.count} Kehadiran` : '0';
         document.getElementById('stat-late-employee').innerText = late && late.lateCount>0 ? late.name : '-'; document.getElementById('stat-late-count').innerText = late ? `${late.lateCount} Kali` : '0';
         document.getElementById('stat-total-hours').innerText = (mins/60).toFixed(1) + " Jam";
+
+        const sortedCount = [...arr].sort((a,b) => b.count - a.count).slice(0,3);
+        const sortedHours = [...arr].sort((a,b) => b.workMinutes - a.workMinutes).slice(0,3);
+        const renderList = (d, t) => d.length ? d.map((e,i) => `<div class="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0"><div class="flex items-center gap-3"><div class="text-xl">${i==0?'🥇':(i==1?'🥈':'🥉')}</div><div><div class="font-bold text-sm text-gray-800">${e.name}</div><div class="text-[10px] text-gray-500">${e.position}</div></div></div><div class="font-bold text-sm ${t=='c'?'text-indigo-600':'text-green-600'}">${t=='c'?e.count+' Shift':(e.workMinutes/60).toFixed(1)+' Jam'}</div></div>`).join('') : '<div class="text-center text-xs text-gray-400">Tidak ada data.</div>';
+        document.getElementById('top-3-attendance').innerHTML = renderList(sortedCount, 'c');
+        document.getElementById('top-3-hours').innerHTML = renderList(sortedHours, 'h');
         document.getElementById('report-table-body').innerHTML = arr.length ? arr.map(r => `<tr class="border-b hover:bg-gray-50"><td class="p-3 border-b font-bold text-gray-800">${r.name}<br><span class="text-xs font-normal text-gray-500">${r.position}</span></td><td class="p-3 border-b text-center font-bold bg-blue-50 text-blue-800 rounded-lg">${r.count}</td><td class="p-3 border-b text-center font-bold text-red-600">${r.lateCount||'-'}</td><td class="p-3 border-b text-center font-bold text-gray-700">${(r.workMinutes/60).toFixed(1)}</td></tr>`).join('') : '<tr><td colspan="4" class="p-8 text-center text-gray-400">Tidak ada data.</td></tr>';
+    }
+
+    // --- EMPLOYEE HALL OF FAME LOGIC ---
+    function showHallOfFame() {
+        const today = new Date();
+        const start = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0,10);
+        const end = today.toISOString().slice(0,10);
+        
+        // Calculate Stats
+        const atts = allData.filter(d => d.type === 'attendance' && d.attendance_date >= start && d.attendance_date <= end);
+        const report = {};
+        atts.forEach(a => {
+            if(!report[a.employee_id]) report[a.employee_id] = { name: a.name, count: 0, workMinutes: 0 };
+            report[a.employee_id].count++;
+            if(a.clock_in_time && a.clock_out_time) report[a.employee_id].workMinutes += timeToHours(a.clock_in_time, a.clock_out_time) * 60;
+        });
+
+        const arr = Object.values(report);
+        const sortedCount = [...arr].sort((a,b) => b.count - a.count).slice(0,3);
+        const sortedHours = [...arr].sort((a,b) => b.workMinutes - a.workMinutes).slice(0,3);
+
+        const renderWhiteList = (d, t) => d.length ? d.map((e,i) => `
+            <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-2 last:border-0 last:pb-0">
+                <div class="flex items-center gap-3">
+                    <div class="${i==0?'medal-1':(i==1?'medal-2':'medal-3')}">${i==0?'🥇':(i==1?'🥈':'🥉')}</div>
+                    <div class="font-bold text-white">${e.name}</div>
+                </div>
+                <div class="font-bold text-yellow-300 text-sm">${t=='c'?e.count+' Shift':(e.workMinutes/60).toFixed(1)+' Jam'}</div>
+            </div>`).join('') : '<div class="text-center text-white opacity-50 text-xs">Belum ada data bulan ini.</div>';
+
+        document.getElementById('hof-list-attendance').innerHTML = renderWhiteList(sortedCount, 'c');
+        document.getElementById('hof-list-hours').innerHTML = renderWhiteList(sortedHours, 'h');
+        
+        document.getElementById('hof-modal').classList.remove('hidden');
     }
 
     // --- EMPLOYEE ---
